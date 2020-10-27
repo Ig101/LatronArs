@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace LatronArs.Engine.Scene.Objects.Structs
 {
     public struct Light

@@ -1,6 +1,6 @@
 using System;
-using System.Drawing;
 using LatronArs.Engine.Scene.Objects;
+using LatronArs.Engine.Scene.Objects.Structs;
 
 namespace LatronArs.Engine.Scene.Components
 {
@@ -12,8 +12,10 @@ namespace LatronArs.Engine.Scene.Components
 
         public Color Color { get; init; }
 
-        public Action<Scene, Tile, Actor> InteractionReaction { get; init; }
+        public double NoiseMultiplier { get; init; }
 
-        public Action<Scene, Tile, Actor> StepReaction { get; init; }
+        public Action<Tile, Actor> InteractionReaction { get; init; }
+
+        public Action<Tile, Actor> StepReaction { get; init; }
     }
 }

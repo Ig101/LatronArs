@@ -1,4 +1,4 @@
-using System.Drawing;
+using LatronArs.Engine.Scene.Objects.Structs;
 
 namespace LatronArs.Engine.Scene.Components
 {

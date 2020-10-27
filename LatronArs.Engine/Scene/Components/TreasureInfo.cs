@@ -10,8 +10,6 @@ namespace LatronArs.Engine.Scene.Components
 
         public double PickupNoise { get; init; }
 
-        public int PileSize { get; init; }
-
         public bool Shines { get; init; }
     }
 }

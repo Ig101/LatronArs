@@ -17,8 +17,12 @@ namespace LatronArs.Engine.Scene.Objects
 
         public double PickupNoise => Info.PickupNoise;
 
-        public int PileSize => Info.PileSize;
-
         public bool Shines => Info.Shines;
+
+        public Treasure(TreasureInfo info, int amount)
+        {
+            Info = info;
+            Amount = amount;
+        }
     }
 }

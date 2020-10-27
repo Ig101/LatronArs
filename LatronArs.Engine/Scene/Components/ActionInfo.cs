@@ -9,6 +9,6 @@ namespace LatronArs.Engine.Scene.Components
 
         public int TimeCost { get; init; }
 
-        public Action<Scene, Actor, ActionInfo> Action { get; init; }
+        public Action<Tile, Actor, ActionInfo> Action { get; init; }
     }
 }

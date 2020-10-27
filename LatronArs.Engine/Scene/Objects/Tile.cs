@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
 using LatronArs.Engine.Scene.Components;
+using LatronArs.Engine.Scene.Objects.Structs;
 
 namespace LatronArs.Engine.Scene.Objects
 {
@@ -23,13 +24,35 @@ namespace LatronArs.Engine.Scene.Objects
 
         public bool LightOn { get; set; }
 
+        public bool LightWorksAndOn => LightOn && CeilingLight != null && CeilingLight.Power > 0;
+
         // Inherit
         public string Sprite => Floor.Sprite;
 
         public Color Color => Floor.Color;
 
-        public Action<Scene, Tile, Actor> InteractionReaction => Floor.InteractionReaction;
+        public Action<Tile, Actor> InteractionReaction => Floor.InteractionReaction;
 
-        public Action<Scene, Tile, Actor> StepReaction => Floor.StepReaction;
+        public Action<Tile, Actor> StepReaction => Floor.StepReaction;
+
+        public double NoiseMultiplier => Floor.NoiseMultiplier;
+
+        public Tile(
+            Scene parent,
+            int x,
+            int y,
+            Floor floor,
+            LightInfo ceilingLight,
+            IEnumerable<Treasure> treasures,
+            bool lightOn = true)
+        {
+            Parent = parent;
+            X = x;
+            Y = y;
+            Floor = floor;
+            CeilingLight = ceilingLight;
+            Treasures = treasures.ToList();
+            LightOn = lightOn;
+        }
     }
 }

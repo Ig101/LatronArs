@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using LatronArs.Engine.Scene.Objects;
+using LatronArs.Engine.Scene.Objects.Structs;
 
 namespace LatronArs.Engine.Scene.Components
 {
@@ -19,7 +19,7 @@ namespace LatronArs.Engine.Scene.Components
 
         public ActionInfo InteractAction { get; init; }
 
-        public Action<Scene, Actor, Actor> InteractionReaction { get; init; }
+        public Action<Actor, Actor> InteractionReaction { get; init; }
 
         public LightInfo Light { get; init; }
 
