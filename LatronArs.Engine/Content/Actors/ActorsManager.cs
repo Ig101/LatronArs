@@ -104,7 +104,7 @@ namespace LatronArs.Engine.Content.Actors
                         InteractionReaction = ActionsManager.SwitchLight,
                         Light = null,
                         PickupTimeCost = 1000,
-                        PickupFromNoiseModifier = 8,
+                        PickupFromNoiseModifier = 100,
                         PickupFromTimeCostModifier = 2,
                         Hearing = 1,
                         Seeing = 1,

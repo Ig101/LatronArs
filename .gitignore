@@ -6,8 +6,6 @@
 #AppSettings
 appsettings.Development.json
 
-wwwroot
-
 # User-specific files
 *.suo
 *.user

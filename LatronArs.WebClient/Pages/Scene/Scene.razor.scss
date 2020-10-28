@@ -1,3 +1,24 @@
-h3 {
-  color: blue;
+.battle {
+  flex: 1;
+  display: flex;
+  .picture {
+    flex: 1;
+    ::deep canvas {
+      width: 100%;
+      height: 100%;
+      background-color: #000818;
+    }
+  }
+  .hud {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    ::deep canvas {
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+    }
+  }
 }

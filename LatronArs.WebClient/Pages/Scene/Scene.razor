@@ -1,5 +1,11 @@
-﻿<h3>Scene</h3>
+﻿@using Blazor.Extensions.Canvas
+@inherits SceneComponent
 
-@code {
-
-}
+<div class="battle">
+  <div class="picture" @ref="PictureContainer">
+    <BECanvas @ref="PictureCanvasRef"></BECanvas>  
+  </div>
+  <div class="hud">
+    <BECanvas @ref="HudCanvasRef"></BECanvas>
+  </div>
+</div>

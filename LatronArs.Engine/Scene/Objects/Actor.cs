@@ -62,6 +62,8 @@ namespace LatronArs.Engine.Scene.Objects
 
         public AIState AIState => AI?.State ?? AIState.Neutral;
 
+        public bool DoAnalysis => AI?.DoAnalysis ?? false;
+
         public SpriteDefinition Sprite => new SpriteDefinition
         {
             Name = string.Intern(Info.Sprite),
@@ -114,6 +116,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         private void AddActorToMemory(int x, int y, Actor actor)
         {
+            // TODO Add memory calculating
             Memories[x][y] = new Memory
             {
                 Sprite = actor.Sprite,
@@ -127,6 +130,7 @@ namespace LatronArs.Engine.Scene.Objects
             if (Memories != null)
             {
                 // TODO UpdateVisionRight
+                // TODO Add memory calculating
                 for (var x = Math.Max(0, Parent.X - 7); x < Math.Min(Memories.Length, Parent.X + 8); x++)
                 {
                     for (var y = Math.Max(0, Parent.Y - 7); y < Math.Min(Memories[x].Length, Parent.Y + 8); y++)
@@ -134,9 +138,9 @@ namespace LatronArs.Engine.Scene.Objects
                         var tile = Parent.Parent.Tiles[x][y];
                         Memories[x][y] = new Memory
                         {
-                            Sprite = tile?.Actor.Sprite,
+                            Sprite = tile.Actor?.Sprite,
                             LightLevel = 1,
-                            Team = tile?.Actor.Team ?? 0,
+                            Team = tile.Actor?.Team ?? 0,
                             Visible = true
                         };
                     }
@@ -160,6 +164,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Interact(Tile tile)
         {
+            Parent.Parent.Changed = true;
             if (InteractAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -169,6 +174,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Move(Tile tile)
         {
+            Parent.Parent.Changed = true;
             if (MoveAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -187,6 +193,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Sprint(Tile tile)
         {
+            Parent.Parent.Changed = true;
             if (SprintAction != null && tile.Actor == null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -205,6 +212,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Pickup(Tile tile, Actor target, Treasure treasure)
         {
+            Parent.Parent.Changed = true;
             ChangeDirection(tile.X, tile.Y);
             var noiseModifier = target?.PickupFromNoiseModifier ?? 1;
             var timeModifier = target?.PickupFromTimeCostModifier ?? 1;

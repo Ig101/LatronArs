@@ -38,22 +38,22 @@ namespace LatronArs.Engine.Generation
                 new Actor(
                 tiles.Find(x => x.X == 25 && x.Y == 20),
                 contentManager.GetActorInfo("guardian"),
-                new AI.ActorAI(50, 50),
+                new AI.ActorAI(true, 50, 50),
                 2),
                 new Actor(
                 tiles.Find(x => x.X == 15 && x.Y == 20),
                 contentManager.GetActorInfo("guardian"),
-                new AI.ActorAI(50, 50),
+                new AI.ActorAI(true, 50, 50),
                 2),
                 new Actor(
                 tiles.Find(x => x.X == 20 && x.Y == 25),
                 contentManager.GetActorInfo("guardian"),
-                new AI.ActorAI(50, 50),
+                new AI.ActorAI(true, 50, 50),
                 2),
                 new Actor(
                 tiles.Find(x => x.X == 20 && x.Y == 15),
                 contentManager.GetActorInfo("guardian"),
-                new AI.ActorAI(50, 50),
+                new AI.ActorAI(true, 50, 50),
                 2)
             };
 
@@ -61,7 +61,7 @@ namespace LatronArs.Engine.Generation
             var player = new Actor(
                 tiles.Find(x => x.X == 20 && x.Y == 20),
                 contentManager.GetActorInfo("thief"),
-                new AI.ActorAI(50, 50),
+                new AI.ActorAI(false, 50, 50),
                 1);
 
             return new Scene.Scene(

@@ -25,6 +25,8 @@ namespace LatronArs.Engine.Scene
 
         public List<Noise>[,] NoiseMap { get; set; }
 
+        public bool Changed { get; set; }
+
         public Scene(
             int width,
             int height,

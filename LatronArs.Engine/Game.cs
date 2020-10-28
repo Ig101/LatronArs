@@ -7,7 +7,7 @@ namespace LatronArs.Engine
 {
     public class Game
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public GameState State { get; set; }
 
@@ -24,5 +24,35 @@ namespace LatronArs.Engine
         public IContentManager ContentManager { get; set; }
 
         public Scene.Scene CurrentScene { get; set; }
+
+        private void SetupNewScene()
+        {
+            CurrentScene = SceneGenerator.GenerateScene(Level, Seed, ContentManager);
+        }
+
+        public static Game StartNewGame(int seed = -1)
+        {
+            var random = new Random();
+            if (seed < 0)
+            {
+                seed = random.Next();
+            }
+
+            var game = new Game()
+            {
+                Id = Guid.NewGuid(),
+                State = GameState.Playing,
+                Random = random,
+                Seed = seed,
+                Level = 1,
+                Money = 0,
+                SceneGenerator = new SceneGenerator(),
+                ContentManager = new ContentManager()
+            };
+
+            game.SetupNewScene();
+
+            return game;
+        }
     }
 }
