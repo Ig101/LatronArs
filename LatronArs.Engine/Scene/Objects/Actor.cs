@@ -22,6 +22,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public int ActionDebt { get; set; }
 
+        // Team 0 is neutral to all
         public int Team { get; set; }
 
         public bool LightWorksAndOn => LightOn && Light != null && Light.Power > 0;
@@ -35,9 +36,9 @@ namespace LatronArs.Engine.Scene.Objects
 
         public ActionInfo SprintAction => Info.SprintAction;
 
-        public ActionInfo InteractAction => Info.InteractAction;
+        public Action<Tile, Actor> InteractAction => Info.InteractAction;
 
-        public Action<Actor, Actor> InteractionReaction => Info.InteractionReaction;
+        public Func<Actor, Actor, int> InteractionReaction => Info.InteractionReaction;
 
         public LightInfo Light => Info.Light;
 
@@ -85,7 +86,11 @@ namespace LatronArs.Engine.Scene.Objects
             Team = team;
             Parent = parent;
             LightOn = lightOn;
-            ai.Parent = this;
+            if (ai != null)
+            {
+                ai.Parent = this;
+            }
+
             parent.Actor = this;
         }
 
@@ -117,15 +122,6 @@ namespace LatronArs.Engine.Scene.Objects
             };
         }
 
-        private void ChangeDirection(int x, int y)
-        {
-            Direction = x > Parent.X ?
-                Direction.Right : x < Parent.X ?
-                Direction.Left : y > Parent.Y ?
-                Direction.Bottom : y < Parent.Y ?
-                Direction.Top : Direction;
-        }
-
         public void UpdateVisionAndMemories()
         {
             if (Memories != null)
@@ -148,6 +144,15 @@ namespace LatronArs.Engine.Scene.Objects
             }
         }
 
+        public void ChangeDirection(int x, int y)
+        {
+            Direction = x > Parent.X ?
+                Direction.Right : x < Parent.X ?
+                Direction.Left : y > Parent.Y ?
+                Direction.Bottom : y < Parent.Y ?
+                Direction.Top : Direction;
+        }
+
         public void IssueNoise(double power, string phrase)
         {
             IssueNoise(Parent, power, phrase);
@@ -158,9 +163,7 @@ namespace LatronArs.Engine.Scene.Objects
             if (InteractAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
-                IssueNoise(tile, tile.NoiseMultiplier * InteractAction.NoiseModifier, null);
-                ActionDebt += InteractAction.TimeCost;
-                InteractAction.Action(tile, this, InteractAction);
+                InteractAction(tile, this);
             }
         }
 
@@ -205,15 +208,15 @@ namespace LatronArs.Engine.Scene.Objects
             ChangeDirection(tile.X, tile.Y);
             var noiseModifier = target?.PickupFromNoiseModifier ?? 1;
             var timeModifier = target?.PickupFromTimeCostModifier ?? 1;
-            IssueNoise(tile, noiseModifier * treasure.PickupNoise * PickupFromNoiseModifier, null);
-            ActionDebt += (int)(timeModifier * treasure.PickupTimeCost * PickupFromTimeCostModifier);
+            IssueNoise(tile, noiseModifier * treasure.PickupNoise, null);
+            ActionDebt += (int)(timeModifier * treasure.PickupTimeCost * PickupTimeCost);
             (target?.Treasures ?? tile.Treasures).Remove(treasure);
             AddTreasure(treasure);
         }
 
         public void Wait()
         {
-            ActionDebt++;
+            ActionDebt += 100;
         }
     }
 }

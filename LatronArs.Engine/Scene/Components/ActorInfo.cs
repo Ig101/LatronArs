@@ -17,9 +17,9 @@ namespace LatronArs.Engine.Scene.Components
 
         public ActionInfo SprintAction { get; init; }
 
-        public ActionInfo InteractAction { get; init; }
+        public Action<Tile, Actor> InteractAction { get; init; }
 
-        public Action<Actor, Actor> InteractionReaction { get; init; }
+        public Func<Actor, Actor, int> InteractionReaction { get; init; }
 
         public LightInfo Light { get; init; }
 

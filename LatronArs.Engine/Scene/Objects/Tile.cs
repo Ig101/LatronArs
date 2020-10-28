@@ -20,18 +20,20 @@ namespace LatronArs.Engine.Scene.Objects
 
         public Floor Floor { get; set; }
 
-        public LightInfo CeilingLight { get; set; }
+        public Ceiling Ceiling { get; set; }
 
         public bool LightOn { get; set; }
 
-        public bool LightWorksAndOn => LightOn && CeilingLight != null && CeilingLight.Power > 0;
+        public bool LightWorksAndOn => LightOn && Light != null && Light.Power > 0;
 
         // Inherit
         public string Sprite => Floor.Sprite;
 
         public Color Color => Floor.Color;
 
-        public Action<Tile, Actor> InteractionReaction => Floor.InteractionReaction;
+        public LightInfo Light => Ceiling?.Light;
+
+        public Func<Tile, Actor, int> InteractionReaction => Ceiling?.InteractionReaction;
 
         public Action<Tile, Actor> StepReaction => Floor.StepReaction;
 
@@ -42,16 +44,16 @@ namespace LatronArs.Engine.Scene.Objects
             int x,
             int y,
             Floor floor,
-            LightInfo ceilingLight,
-            IEnumerable<Treasure> treasures,
-            bool lightOn = true)
+            Ceiling ceiling = null,
+            bool lightOn = true,
+            IEnumerable<Treasure> treasures = null)
         {
             Parent = parent;
             X = x;
             Y = y;
             Floor = floor;
-            CeilingLight = ceilingLight;
-            Treasures = treasures.ToList();
+            Ceiling = ceiling;
+            Treasures = treasures?.ToList() ?? new List<Treasure>();
             LightOn = lightOn;
         }
     }

@@ -6,8 +6,10 @@ namespace LatronArs.Engine.Content
     {
         ActorInfo GetActorInfo(string id);
 
-        Floor GetFloor(string id);
+        Floor GetFloorInfo(string id);
 
         TreasureInfo GetTreasureInfo(string id);
+
+        Ceiling GetCeilingInfo(string id);
     }
 }

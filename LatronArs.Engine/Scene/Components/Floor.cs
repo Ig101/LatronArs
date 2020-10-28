@@ -14,8 +14,6 @@ namespace LatronArs.Engine.Scene.Components
 
         public double NoiseMultiplier { get; init; }
 
-        public Action<Tile, Actor> InteractionReaction { get; init; }
-
         public Action<Tile, Actor> StepReaction { get; init; }
     }
 }

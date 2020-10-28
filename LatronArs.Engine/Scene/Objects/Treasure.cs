@@ -13,7 +13,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public int Value => Info.Value;
 
-        public double PickupTimeCost => Info.PickupTimeCost;
+        public double PickupTimeCost => Info.PickupTimeCostModifier;
 
         public double PickupNoise => Info.PickupNoise;
 

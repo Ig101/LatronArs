@@ -44,6 +44,7 @@ namespace LatronArs.Engine.Scene
 
             foreach (var tile in tiles)
             {
+                tile.Parent = this;
                 Tiles[tile.X][tile.Y] = tile;
             }
 

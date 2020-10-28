@@ -6,7 +6,7 @@ namespace LatronArs.Engine.Scene.Components
 
         public int Value { get; set; }
 
-        public double PickupTimeCost { get; init; }
+        public double PickupTimeCostModifier { get; init; }
 
         public double PickupNoise { get; init; }
 
