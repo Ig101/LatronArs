@@ -1,7 +1,7 @@
 @using LatronArs.WebClient.Pages.Scene
 @using LatronArs.Models.Enums
 @inherits LayoutComponentBase
-@inject LatronArs.WebClient.Services.GameService _gameService
+@inject LatronArs.WebClient.Services.Interfaces.IGameService _gameService
 
 <div class="container">
     @if (State == GameState.Playing)

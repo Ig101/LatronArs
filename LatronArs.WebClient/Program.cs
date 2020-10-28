@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using LatronArs.WebClient.Services;
+using LatronArs.WebClient.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,8 @@ namespace LatronArs.WebClient
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            builder.Services.AddSingleton<GameService>();
+            builder.Services.AddSingleton<IGameService, GameService>();
+            builder.Services.AddSingleton<ISpritesService, SpritesService>();
             builder.Services.AddSingleton<ResizeService>();
 
             await builder.Build().RunAsync();

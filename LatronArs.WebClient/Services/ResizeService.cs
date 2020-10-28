@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using LatronArs.WebClient.Services.Interfaces;
 using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Services

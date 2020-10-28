@@ -1,10 +1,11 @@
 using LatronArs.Engine;
 using LatronArs.Engine.Scene;
 using LatronArs.Models.Enums;
+using LatronArs.WebClient.Services.Interfaces;
 
 namespace LatronArs.WebClient.Services
 {
-    public class GameService
+    public class GameService : IGameService
     {
         private Game _game;
 
