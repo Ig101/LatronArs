@@ -1,4 +1,6 @@
 using System;
+using LatronArs.Engine.Content;
+using LatronArs.Engine.Generation;
 using LatronArs.Models.Enums;
 
 namespace LatronArs.Engine
@@ -16,6 +18,10 @@ namespace LatronArs.Engine
         public int Level { get; set; }
 
         public int Seed { get; set; }
+
+        public ISceneGenerator SceneGenerator { get; set; }
+
+        public IContentManager ContentManager { get; set; }
 
         public Scene.Scene CurrentScene { get; set; }
     }

@@ -19,8 +19,6 @@ namespace LatronArs.Engine.Scene
 
         public ICollection<Actor> IntelligentActors { get; set; }
 
-        public Memory[][] Memories { get; set; }
-
         public Tile[][] Tiles { get; set; }
 
         public Light[,] LightMap { get; set; }
@@ -33,7 +31,6 @@ namespace LatronArs.Engine.Scene
             int time,
             IEnumerable<Tile> tiles,
             IEnumerable<Actor> intelligentActors,
-            Memory[][] memories,
             Actor player)
         {
             Width = width;
@@ -50,27 +47,21 @@ namespace LatronArs.Engine.Scene
                 Tiles[tile.X][tile.Y] = tile;
             }
 
-            Memories = memories;
             Player = player;
             IntelligentActors = intelligentActors.ToList();
             Leaving = false;
 
             UpdateLightMap();
+            player.UpdateVisionAndMemories();
+            foreach (var actor in intelligentActors)
+            {
+                actor.UpdateVisionAndMemories();
+            }
         }
 
         private void UpdateLightMap()
         {
             // TODO LightMechanic
-        }
-
-        private void UpdateMemoriesMap()
-        {
-            // TODO UpdateMemories
-        }
-
-        private void UpdateActorVision(Actor actor)
-        {
-            // TODO UpdateVision
         }
 
         private void AfterActionUpdate()
@@ -92,13 +83,12 @@ namespace LatronArs.Engine.Scene
 
             // Updates
             UpdateLightMap();
-            UpdateActorVision(Player);
-            UpdateMemoriesMap();
+            Player.UpdateVisionAndMemories();
 
             // ActorUpdates
             foreach (var actor in IntelligentActors)
             {
-                UpdateActorVision(Player);
+                actor.UpdateVisionAndMemories();
 
                 // TODOLP params update and reaction
             }

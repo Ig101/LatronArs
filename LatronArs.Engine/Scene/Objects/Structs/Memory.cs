@@ -1,13 +1,15 @@
+using LatronArs.Engine.Scene.Components;
+
 namespace LatronArs.Engine.Scene.Objects.Structs
 {
     public struct Memory
     {
-        public string Sprite { get; set; }
-
-        public bool HasItems { get; set; }
+        public SpriteDefinition Sprite { get; set; }
 
         public double LightLevel { get; set; }
 
-        public int ExpirationTime { get; set; }
+        public int Team { get; set; }
+
+        public bool Visible { get; set; }
     }
 }
