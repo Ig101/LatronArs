@@ -32,7 +32,7 @@ namespace LatronArs.WebClient.Helpers
             throw new Exception("Shader program is not compiled");
         }
 
-        public static void FillBackground(byte[] backgrounds, byte r, byte g, byte b, int texturePosition)
+        public static void FillLight(byte[] backgrounds, byte r, byte g, byte b, int texturePosition)
         {
             backgrounds[texturePosition * 4] = r;
             backgrounds[(texturePosition * 4) + 1] = g;

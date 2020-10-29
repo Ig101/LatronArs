@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Engine.Scene.Components;
 using LatronArs.WebClient.Services.Interfaces;
@@ -18,7 +19,7 @@ namespace LatronArs.WebClient.Services
             throw new System.NotImplementedException();
         }
 
-        public (WebGLTexture texture, WebGLTexture mask) GetSpriteTextures(WebGLContext gl)
+        public Task<(WebGLTexture texture, WebGLTexture mask)> GetSpriteTexturesAsync(WebGLContext gl)
         {
             throw new System.NotImplementedException();
         }

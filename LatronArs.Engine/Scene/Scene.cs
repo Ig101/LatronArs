@@ -28,9 +28,9 @@ namespace LatronArs.Engine.Scene
 
         public Tile[][] Tiles { get; set; }
 
-        public Light[,] LightMap { get; set; }
+        public Light[][] LightMap { get; set; }
 
-        public List<Noise>[,] NoiseMap { get; set; }
+        public List<Noise>[][] NoiseMap { get; set; }
 
         public bool Changed { get; set; }
 
@@ -45,10 +45,18 @@ namespace LatronArs.Engine.Scene
             Width = width;
             Height = height;
             Time = time;
+            LightMap = new Light[width][];
+            NoiseMap = new List<Noise>[width][];
             Tiles = new Tile[width][];
-            for (int i = 0; i < width; i++)
+            for (int x = 0; x < width; x++)
             {
-                Tiles[i] = new Tile[height];
+                Tiles[x] = new Tile[height];
+                LightMap[x] = new Light[height];
+                NoiseMap[x] = new List<Noise>[height];
+                for (int y = 0; y < height; y++)
+                {
+                    NoiseMap[x][y] = new List<Noise>();
+                }
             }
 
             foreach (var tile in tiles)
@@ -72,12 +80,22 @@ namespace LatronArs.Engine.Scene
         private void UpdateLightMap()
         {
             // TODO LightMechanic
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    LightMap[x][y] = new Light
+                    {
+                        Power = 0.9,
+                        Color = new Color { R = 255, G = 255, B = 155 }
+                    };
+                }
+            }
         }
 
         private void AfterActionUpdate()
         {
             // Actions phase
-            this.NoiseMap = new List<Noise>[Width, Height];
             var time = Player.ActionDebt;
             Time += time;
             Player.ActionDebt = 0;
@@ -136,6 +154,14 @@ namespace LatronArs.Engine.Scene
                     Arrested = false,
                     Timeout = false
                 });
+            }
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    NoiseMap[x][y].Clear();
+                }
             }
         }
 

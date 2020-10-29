@@ -10,8 +10,6 @@ namespace LatronArs.Engine.Scene.Components
 
         public string Sprite { get; init; }
 
-        public Color Color { get; init; }
-
         public double NoiseMultiplier { get; init; }
 
         public Action<Tile, Actor> StepReaction { get; init; }

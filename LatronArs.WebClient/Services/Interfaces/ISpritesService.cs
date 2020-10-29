@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Engine.Scene.Components;
 
@@ -14,6 +15,6 @@ namespace LatronArs.WebClient.Services.Interfaces
 
         (Point position, bool mirrored) GetSpritePositionByDefinition(SpriteDefinition definition);
 
-        (WebGLTexture texture, WebGLTexture mask) GetSpriteTextures(WebGLContext gl);
+        Task<(WebGLTexture texture, WebGLTexture mask)> GetSpriteTexturesAsync(WebGLContext gl);
     }
 }

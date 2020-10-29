@@ -28,14 +28,7 @@ namespace LatronArs.Engine.Scene.Objects
         public bool LightWorksAndOn => LightOn && Light != null && Light.Power > 0;
 
         // Inherit
-        public SpriteDefinition Sprite => new SpriteDefinition
-        {
-            Name = string.Intern(Floor.Sprite),
-            State = AIState.Neutral,
-            Direction = Direction.Right,
-            HasItems = Treasures.Any(x => x.Shines),
-            Color = Floor.Color
-        };
+        public string Sprite => string.Intern(Floor.Sprite);
 
         public LightInfo Light => Ceiling?.Light;
 

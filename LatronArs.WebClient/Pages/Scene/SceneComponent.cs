@@ -79,6 +79,9 @@ namespace LatronArs.WebClient.Pages.Scene
 
             var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
             var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
+            var textures = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
+            _spritesTexture = textures.texture;
+            _masksTexture = textures.mask;
             _program = await WebGLHelper.CompileProgram(_pictureContext, vertexShader, fragmentShader);
 
             await SetupAspectRatio();
@@ -150,7 +153,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     HasItems = false,
                 },
                 texturePosition);
-            WebGLHelper.FillBackground(colors, 0, 0, 0, texturePosition);
+            WebGLHelper.FillLight(colors, 255, 255, 255, texturePosition);
         }
 
         private void FillPoint(
@@ -158,7 +161,6 @@ namespace LatronArs.WebClient.Pages.Scene
             int y,
             int texturePosition)
         {
-            var tile = GameService.CurrentScene.Tiles[x][y];
             var memory = GameService.CurrentScene.Player.Memories[x][y];
             if (memory != null)
             {
@@ -190,13 +192,20 @@ namespace LatronArs.WebClient.Pages.Scene
 
                 if (memoryVal.Visible)
                 {
-                    var tileSprite = tile.Sprite;
+                    var tile = GameService.CurrentScene.Tiles[x][y];
+                    var light = GameService.CurrentScene.LightMap[x][y];
+                    var tileSprite = new Engine.Scene.Components.SpriteDefinition
+                    {
+                        Name = tile.Sprite,
+                        Direction = Direction.Right,
+                        State = AIState.Neutral
+                    };
                     WebGLHelper.FillSprite(
                         SpritesService,
                         backgroundTextureMapping,
                         tileSprite,
                         texturePosition);
-                    WebGLHelper.FillBackground(colors, tileSprite.Color.R, tileSprite.Color.G, tileSprite.Color.B, texturePosition);
+                    WebGLHelper.FillLight(colors, (byte)(light.Color.R * light.Power), (byte)(light.Color.G * light.Power), (byte)(light.Color.B * light.Power), texturePosition);
                 }
                 else
                 {
