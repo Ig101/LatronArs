@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Extensions;
@@ -36,6 +37,9 @@ namespace LatronArs.WebClient.Pages.Scene
 
         [Inject]
         private ResizeService ResizeService { get; set; }
+
+        [Inject]
+        private HttpClient HttpClient { get; set; }
 
         protected BECanvasComponent PictureCanvasRef { get; set; }
 
@@ -72,6 +76,10 @@ namespace LatronArs.WebClient.Pages.Scene
 
             _pictureContext = await PictureCanvasRef.CreateWebGLAsync();
             _hudContext = await HudCanvasRef.CreateCanvas2DAsync();
+
+            var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
+            var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
+            _program = await WebGLHelper.CompileProgram(_pictureContext, vertexShader, fragmentShader);
 
             await SetupAspectRatio();
 

@@ -9,6 +9,29 @@ namespace LatronArs.WebClient.Helpers
 {
     public static class WebGLHelper
     {
+        public static async Task<WebGLProgram> CompileProgram(WebGLContext gl, string vertex, string fragment)
+        {
+            var program = await gl.CreateProgramAsync();
+
+            var vertexShader = await gl.CreateShaderAsync(ShaderType.VERTEX_SHADER);
+            await gl.ShaderSourceAsync(vertexShader, vertex);
+            await gl.CompileShaderAsync(vertexShader);
+
+            var fragmentShader = await gl.CreateShaderAsync(ShaderType.FRAGMENT_SHADER);
+            await gl.ShaderSourceAsync(fragmentShader, fragment);
+            await gl.CompileShaderAsync(fragmentShader);
+
+            await gl.AttachShaderAsync(program, vertexShader);
+            await gl.AttachShaderAsync(program, fragmentShader);
+            await gl.LinkProgramAsync(program);
+            if (await gl.GetProgramParameterAsync<bool>(program, ProgramParameter.LINK_STATUS))
+            {
+                return program;
+            }
+
+            throw new Exception("Shader program is not compiled");
+        }
+
         public static void FillBackground(byte[] backgrounds, byte r, byte g, byte b, int texturePosition)
         {
             backgrounds[texturePosition * 4] = r;
