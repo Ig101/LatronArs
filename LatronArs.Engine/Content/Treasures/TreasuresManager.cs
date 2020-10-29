@@ -13,6 +13,7 @@ namespace LatronArs.Engine.Content.Treasures
                     "coin", new TreasureInfo
                     {
                         Id = "coin",
+                        Name = "Coins",
                         Value = 1,
                         PickupTimeCostModifier = 0.5,
                         PickupNoise = 0.1,

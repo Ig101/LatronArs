@@ -11,11 +11,17 @@ namespace LatronArs.WebClient.Services
 
         public Scene CurrentScene => _game?.CurrentScene;
 
-        public GameState State => _game?.State ?? GameState.Unknown;
+        public GameState State { get; private set; }
+
+        private void ChangeGameState(GameState state)
+        {
+            State = state;
+        }
 
         public GameService()
         {
-            _game = Game.StartNewGame();
+            _game = Game.StartNewGame(ChangeGameState);
+            State = _game.State;
         }
     }
 }

@@ -13,21 +13,21 @@ namespace LatronArs.Engine.AI
 
         public AIState State { get; set; }
 
-        public Memory[][] Memories { get; }
+        public Memory?[][] Memories { get; }
 
         public ActorAI(bool doAnalysis, int width, int height)
         {
             DoAnalysis = doAnalysis;
-            Memories = new Memory[width][];
+            Memories = new Memory?[width][];
             for (int i = 0; i < width; i++)
             {
-                Memories[i] = new Memory[height];
+                Memories[i] = new Memory?[height];
             }
 
             State = AIState.Neutral;
         }
 
-        public ActorAI(bool doAnalysis, Memory[][] memories, AIState state)
+        public ActorAI(bool doAnalysis, Memory?[][] memories, AIState state)
         {
             DoAnalysis = doAnalysis;
             Memories = memories;

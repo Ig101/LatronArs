@@ -30,7 +30,7 @@ namespace LatronArs.Engine.Scene.Objects
         public ActorAI AI { get; set; }
 
         // Inherited
-        public Color Color => Info.Color;
+        public string Name => Info.Name;
 
         public ActionInfo MoveAction => Info.MoveAction;
 
@@ -58,7 +58,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public double NoiseTransmission => Info.NoiseTransmission;
 
-        public Memory[][] Memories => AI?.Memories;
+        public Memory?[][] Memories => AI?.Memories;
 
         public AIState AIState => AI?.State ?? AIState.Neutral;
 
@@ -69,7 +69,8 @@ namespace LatronArs.Engine.Scene.Objects
             Name = string.Intern(Info.Sprite),
             State = AIState,
             Direction = Direction,
-            HasItems = Treasures.Any(x => x.Shines)
+            HasItems = Treasures.Any(x => x.Shines) || Parent.Treasures.Any(x => x.Shines),
+            Color = Info.Color
         };
 
         public Actor(
@@ -121,7 +122,7 @@ namespace LatronArs.Engine.Scene.Objects
             {
                 Sprite = actor.Sprite,
                 LightLevel = 0,
-                Team = actor.Team
+                Team = actor.Team,
             };
         }
 

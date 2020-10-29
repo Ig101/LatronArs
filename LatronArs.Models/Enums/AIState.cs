@@ -3,6 +3,7 @@ namespace LatronArs.Models.Enums
     public enum AIState
     {
         Neutral,
-        Alerted
+        Alerted,
+        Unconcious
     }
 }

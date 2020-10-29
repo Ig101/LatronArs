@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Engine.Scene.Components;
+using LatronArs.Engine.Scene.Objects.Structs;
 using LatronArs.WebClient.Services.Interfaces;
 
 namespace LatronArs.WebClient.Helpers

@@ -14,6 +14,7 @@ namespace LatronArs.Engine.Content.Actors
                     {
                         Id = "thief",
                         Sprite = "thief",
+                        Name = "You",
                         Color = new Scene.Objects.Structs.Color { R = 255, G = 255, B = 255 },
                         MoveAction = new ActionInfo
                         {
@@ -45,6 +46,7 @@ namespace LatronArs.Engine.Content.Actors
                     {
                         Id = "guardian",
                         Sprite = "guardian",
+                        Name = "Guard",
                         Color = new Scene.Objects.Structs.Color { R = 255, G = 255, B = 255 },
                         MoveAction = new ActionInfo
                         {
@@ -76,6 +78,7 @@ namespace LatronArs.Engine.Content.Actors
                     {
                         Id = "counter",
                         Sprite = "counter",
+                        Name = "Counter",
                         Color = new Scene.Objects.Structs.Color { R = 255, G = 255, B = 255 },
                         MoveAction = null,
                         SprintAction = null,
@@ -97,6 +100,7 @@ namespace LatronArs.Engine.Content.Actors
                     {
                         Id = "torch",
                         Sprite = "torch",
+                        Name = "Torch",
                         Color = new Scene.Objects.Structs.Color { R = 255, G = 255, B = 255 },
                         MoveAction = null,
                         SprintAction = null,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LatronArs.Engine.Scene.Components;
 using LatronArs.Engine.Scene.Objects.Structs;
+using LatronArs.Models.Enums;
 
 namespace LatronArs.Engine.Scene.Objects
 {
@@ -27,9 +28,14 @@ namespace LatronArs.Engine.Scene.Objects
         public bool LightWorksAndOn => LightOn && Light != null && Light.Power > 0;
 
         // Inherit
-        public string Sprite => Floor.Sprite;
-
-        public Color Color => Floor.Color;
+        public SpriteDefinition Sprite => new SpriteDefinition
+        {
+            Name = string.Intern(Floor.Sprite),
+            State = AIState.Neutral,
+            Direction = Direction.Right,
+            HasItems = Treasures.Any(x => x.Shines),
+            Color = Floor.Color
+        };
 
         public LightInfo Light => Ceiling?.Light;
 

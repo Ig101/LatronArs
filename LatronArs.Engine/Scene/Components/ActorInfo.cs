@@ -11,6 +11,8 @@ namespace LatronArs.Engine.Scene.Components
 
         public string Sprite { get; init; }
 
+        public string Name { get; init; }
+
         public Color Color { get; init; }
 
         public ActionInfo MoveAction { get; init; }

@@ -1,12 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LatronArs.Engine.Scene.Objects;
 using LatronArs.Engine.Scene.Objects.Structs;
+using LatronArs.Engine.Transition;
 
 namespace LatronArs.Engine.Scene
 {
     public class Scene
     {
+        public const int ActionPointsPerSecond = 10;
+        public const int HoursForPlay = 4;
+
+        public event Action<SceneResult> SceneFinished;
+
         public int Time { get; set; }
 
         public int Width { get; }
@@ -97,6 +104,39 @@ namespace LatronArs.Engine.Scene
             }
 
             // VictoryChecks
+            var timeout = Time / ActionPointsPerSecond > HoursForPlay * 60 * 60;
+            if (Player.AIState == Models.Enums.AIState.Unconcious)
+            {
+                SceneFinished(new SceneResult
+                {
+                    CollectedTreasures = Array.Empty<Treasure>(),
+                    Time = Time,
+                    Arrested = true,
+                    Timeout = timeout
+                });
+            }
+
+            if (timeout)
+            {
+                SceneFinished(new SceneResult
+                {
+                    CollectedTreasures = Array.Empty<Treasure>(),
+                    Time = Time,
+                    Arrested = false,
+                    Timeout = true
+                });
+            }
+
+            if (Leaving)
+            {
+                SceneFinished(new SceneResult
+                {
+                    CollectedTreasures = Player.Treasures,
+                    Time = Time,
+                    Arrested = false,
+                    Timeout = false
+                });
+            }
         }
 
         public bool GetSimpleProcessingState(int x, int y)
@@ -109,7 +149,7 @@ namespace LatronArs.Engine.Scene
         {
             var tile = Tiles[x][y];
             var result = tile.Treasures.Select(x => (target: (Actor)null, treasure: x)).ToList();
-            if (tile.Actor != null)
+            if (tile.Actor != null && tile.Actor != Player)
             {
                 result.AddRange(tile.Actor.Treasures.Select(x => (target: tile.Actor, treasure: x)));
             }

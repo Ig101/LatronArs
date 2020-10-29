@@ -11,6 +11,8 @@ namespace LatronArs.Engine.Scene.Objects
         // Inherited
         public string Id => Info.Id;
 
+        public string Name => Info.Name;
+
         public int Value => Info.Value;
 
         public double PickupTimeCost => Info.PickupTimeCostModifier;
