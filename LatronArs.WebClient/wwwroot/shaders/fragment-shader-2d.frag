@@ -47,9 +47,9 @@ void main() {
         );
     } else {
         gl_FragColor = vec(
-            (1.0 - shinesAlpha) * ((textureColor.a * ((1.0 - maskTextureColor.b) * textureColor.r + maskTextureColor.b * color.r) + (1.0 - textureColor.a) * backgroundTextureColor.r) * backgroundColor.r) + shinesAlpha,
-            (1.0 - shinesAlpha) * ((textureColor.a * ((1.0 - maskTextureColor.b) * textureColor.g + maskTextureColor.b * color.g) + (1.0 - textureColor.a) * backgroundTextureColor.g) * backgroundColor.g) + shinesAlpha,
-            (1.0 - shinesAlpha) * ((textureColor.a * ((1.0 - maskTextureColor.b) * textureColor.b + maskTextureColor.b * color.b) + (1.0 - textureColor.a) * backgroundTextureColor.b) * backgroundColor.b),
+            (1.0 - shinesAlpha) * ((textureColor.a * textureColor.r * ((1.0 - maskTextureColor.b) + maskTextureColor.b * color.r) + (1.0 - textureColor.a) * backgroundTextureColor.r) * backgroundColor.r) + shinesAlpha,
+            (1.0 - shinesAlpha) * ((textureColor.a * textureColor.g * ((1.0 - maskTextureColor.b) + maskTextureColor.b * color.g) + (1.0 - textureColor.a) * backgroundTextureColor.g) * backgroundColor.g) + shinesAlpha,
+            (1.0 - shinesAlpha) * ((textureColor.a * textureColor.b * ((1.0 - maskTextureColor.b) + maskTextureColor.b * color.b) + (1.0 - textureColor.a) * backgroundTextureColor.b) * backgroundColor.b),
             max(shinesAlpha, max(textureColor.a, backgroundTextureColor.a)
         );
     }
