@@ -59,7 +59,7 @@ namespace LatronArs.Engine.Generation
 
             // Player
             var player = new Actor(
-                tiles.Find(x => x.X == 20 && x.Y == 20),
+                tiles.Find(x => x.X == 24 && x.Y == 24),
                 contentManager.GetActorInfo("thief"),
                 new AI.ActorAI(false, 50, 50),
                 1);

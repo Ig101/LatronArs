@@ -187,26 +187,26 @@ namespace LatronArs.WebClient.Helpers
 
             var colorTexture = await gl.CreateTextureAsync();
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, colorTexture);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 0x2600);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 0x2600);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 9728);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 9728);
             await gl.TexImage2DAsync(Texture2DType.TEXTURE_2D, 0, PixelFormat.RGBA, colorsWidth, colorsHeight, PixelFormat.RGBA, PixelType.UNSIGNED_BYTE, colors);
 
             var backgroundTexture = await gl.CreateTextureAsync();
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, backgroundTexture);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 0x2600);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 0x2600);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 9728);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 9728);
             await gl.TexImage2DAsync(Texture2DType.TEXTURE_2D, 0, PixelFormat.RGBA, colorsWidth, colorsHeight, PixelFormat.RGBA, PixelType.UNSIGNED_BYTE, backgrounds);
 
             var maskTexture = await gl.CreateTextureAsync();
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, maskTexture);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 0x812F);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 0x2600);
-            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 0x2600);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 33071);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 9728);
+            await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 9728);
             await gl.TexImage2DAsync(Texture2DType.TEXTURE_2D, 0, PixelFormat.RGBA, colorsWidth, colorsHeight, PixelFormat.RGBA, PixelType.UNSIGNED_BYTE, masks);
 
             var positionResolutionLocation = await gl.GetUniformLocationAsync(program, "u_positionResolution");
@@ -253,13 +253,11 @@ namespace LatronArs.WebClient.Helpers
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, texture);
             await gl.ActiveTextureAsync(Texture.TEXTURE4);
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, mask);
+            await gl.EnableAsync(EnableCap.BLEND);
             await gl.BlendFuncAsync(BlendingMode.SRC_ALPHA, BlendingMode.ONE_MINUS_SRC_ALPHA);
 
-            var lengths = vertexPositions.Length / 2 / colorsHeight;
-            for (var i = 0; i < colorsHeight - 10; i++)
-            {
-                await gl.DrawArraysAsync(Primitive.TRIANGLES, i * lengths, lengths);
-            }
+            var lengths = vertexPositions.Length / 2;
+            await gl.DrawArraysAsync(Primitive.TRIANGLES, 0, lengths);
         }
     }
 }

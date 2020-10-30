@@ -54,6 +54,7 @@ texture = {
     },
     buildTexture: function(canvas) {
         var gl = canvas.getContext('webgl');
+        console.log(gl);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
         return gl;
     },

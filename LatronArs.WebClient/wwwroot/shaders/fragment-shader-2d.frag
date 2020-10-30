@@ -33,9 +33,9 @@ void main() {
 
     if (mask.g != 0.0) {
         gl_FragColor = vec4(
-            (1.0 - shinesAlpha) * ((maskTextureColor.g * color.r + (1.0 - maskTextureColor.g) * backgroundTextureColor.r) * backgroundColor.r) + shinesAlpha,
-            (1.0 - shinesAlpha) * ((maskTextureColor.g * color.g + (1.0 - maskTextureColor.g) * backgroundTextureColor.g) * backgroundColor.g) + shinesAlpha,
-            (1.0 - shinesAlpha) * ((maskTextureColor.g * color.b + (1.0 - maskTextureColor.g) * backgroundTextureColor.b) * backgroundColor.b),
+            (1.0 - shinesAlpha) * (maskTextureColor.g * color.r * backgroundColor.r) + shinesAlpha,
+            (1.0 - shinesAlpha) * (maskTextureColor.g * color.g * backgroundColor.g) + shinesAlpha,
+            (1.0 - shinesAlpha) * (maskTextureColor.g * color.b * backgroundColor.b) + shinesAlpha,
             max(shinesAlpha, max(maskTextureColor.g, backgroundTextureColor.a))
         );
     } else if (mask.a != 0.0) {

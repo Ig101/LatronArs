@@ -240,16 +240,16 @@ namespace LatronArs.WebClient.Pages.Scene
             if (scene.Changed && scene.Player != null)
             {
                 CameraX = scene.Player.Parent.X + 0.5;
-                CameraY = scene.Player.Parent.Y + 0.5;
+                CameraY = scene.Player.Parent.Y - 0.5;
             }
 
-            var cameraLeft = CameraX - ((canvasSize.Width - InterfaceShift) / 2 / TileSize);
-            var cameraTop = CameraY - (canvasSize.Height / 2 / TileSize);
+            var cameraLeft = CameraX - (canvasSize.Width / 2 / TileSize / zoom);
+            var cameraTop = CameraY - (canvasSize.Height / 2 / TileSize / zoom);
 
             var left = (int)(cameraLeft - 1);
-            var right = (int)(cameraLeft + (canvasSize.Width / TileSize) + 2);
+            var right = (int)(cameraLeft + (canvasSize.Width / TileSize / zoom) + 2);
             var top = (int)(cameraTop - 1);
-            var bottom = (int)(cameraTop + (canvasSize.Height / TileSize) + 2);
+            var bottom = (int)(cameraTop + (canvasSize.Height / TileSize / zoom) + 2);
             var width = right - left + 1;
             var height = bottom - top + 1;
 
@@ -296,7 +296,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 (right - left + 1) * TileSize,
                 (bottom - top + 1) * TileSize,
                 (int)((left - cameraLeft) * TileSize),
-                (int)((top - cameraTop - 1) * TileSize),
+                (int)((top - cameraTop) * TileSize),
                 right - left + 1,
                 bottom - top + 1,
                 SpritesService.Width,
