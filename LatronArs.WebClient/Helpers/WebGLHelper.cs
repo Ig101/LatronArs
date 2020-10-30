@@ -149,6 +149,8 @@ namespace LatronArs.WebClient.Helpers
             int textureWidth,
             int textureHeight)
         {
+            await gl.ClearColorAsync(0, 0, 0, 1);
+
             uint positionLocation = (uint)await gl.GetAttribLocationAsync(program, "a_position");
             uint texcoordLocation = (uint)await gl.GetAttribLocationAsync(program, "a_texCoord");
             uint backgroundTexcoordLocation = (uint)await gl.GetAttribLocationAsync(program, "a_backgroundTexCoord");

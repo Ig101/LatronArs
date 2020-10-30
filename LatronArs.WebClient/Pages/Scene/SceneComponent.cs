@@ -20,10 +20,10 @@ namespace LatronArs.WebClient.Pages.Scene
 {
     public class SceneComponent : ComponentBase, IDisposable
     {
-        private const int DefaultWidth = 1600;
-        private const int DefaultHeight = 1080;
+        private const int DefaultWidth = 1024;
+        private const int DefaultHeight = 768;
         private const int DefaultAspectRatio = DefaultWidth / DefaultHeight;
-        private const int TileSize = 64;
+        private const int TileSize = 62;
         private const int TileOffset = 16;
 
         [Inject]
@@ -79,11 +79,10 @@ namespace LatronArs.WebClient.Pages.Scene
 
             var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
             var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
-            var textures = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
-            _spritesTexture = textures.texture;
-            _masksTexture = textures.mask;
             _program = await WebGLHelper.CompileProgram(_pictureContext, vertexShader, fragmentShader);
-
+            var (texture, mask) = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
+            _spritesTexture = texture;
+            _masksTexture = mask;
             await SetupAspectRatio();
 
             updatingStopwatch = new Stopwatch();

@@ -1,7 +1,10 @@
 @using LatronArs.WebClient.Pages.Scene
 @using LatronArs.Models.Enums
+@using Blazor.Extensions.Canvas
+@using Blazor.Extensions
 @inherits LayoutComponentBase
 @inject LatronArs.WebClient.Services.Interfaces.IGameService _gameService
+@inject LatronArs.WebClient.Services.Interfaces.ISpritesService _spritesService
 
 <div class="container">
     @if (State == GameState.Playing)
@@ -15,7 +18,13 @@
 </div>
 
 @code {
+    GameState State => _gameService.State;
 
-    GameState State => _gameService.State;    
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _spritesService.SetupTexturesAsync();
+        }
+    }
 }
