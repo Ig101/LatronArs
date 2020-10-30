@@ -17,7 +17,7 @@ using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Services
 {
-    public class SpritesService : ISpritesService, IDisposable
+    public class SpritesService : ISpritesService
     {
         private IJSRuntime _jsRuntime;
 
@@ -29,28 +29,28 @@ namespace LatronArs.WebClient.Services
 
         public int Height { get; private set; }
 
-        private IDictionary<string, IEnumerable<SpriteVariation>> _spritesList;
+        public bool TexturesLoaded { get; private set; }
 
-        private AutoResetEvent _mutex;
+        private IDictionary<string, IEnumerable<SpriteVariation>> _spritesList;
 
         public SpritesService(IJSRuntime jSRuntime)
         {
             _jsRuntime = jSRuntime;
-            _mutex = new AutoResetEvent(false);
+            TexturesLoaded = false;
         }
 
         private async Task AppendFullImage(string path, bool mask, int startingPosition)
         {
-            await _jsRuntime.InvokeAsync<object>("texture.drawImage", path + ".png", (SpriteWidth + 2) * startingPosition, 0);
+            await _jsRuntime.InvokeAsync<object>("texture.drawTexture", path + ".png", (SpriteWidth + 2) * startingPosition, 0);
             if (mask)
             {
-                await _jsRuntime.InvokeAsync<object>("texture.drawImage", path + ".mask.png", (SpriteWidth + 2) * startingPosition, SpriteHeight + 2);
+                await _jsRuntime.InvokeAsync<object>("texture.drawMask", path + ".mask.png", (SpriteWidth + 2) * startingPosition, 0);
             }
         }
 
         private async Task AppendSquareImage(string path, int startingPosition)
         {
-            await _jsRuntime.InvokeAsync<object>("texture.drawImage", path + ".png", (SpriteWidth + 2) * startingPosition, SpriteHeight - SpriteWidth);
+            await _jsRuntime.InvokeAsync<object>("texture.drawTexture", path + ".png", (SpriteWidth + 2) * startingPosition, SpriteHeight - SpriteWidth);
         }
 
         private void FillSpritesList()
@@ -65,7 +65,7 @@ namespace LatronArs.WebClient.Services
             FillSpritesList();
             var sprites = _spritesList.Values.SelectMany(x => x);
             Width = (SpriteWidth + 2) * sprites.Count();
-            await _jsRuntime.InvokeAsync<object>("texture.createCanvas", Height * 2, Width);
+            await _jsRuntime.InvokeAsync<object>("texture.createCanvas", Width, Height);
             var startingPosition = 0;
             foreach (var sprite in sprites)
             {
@@ -84,7 +84,7 @@ namespace LatronArs.WebClient.Services
                 startingPosition++;
             }
 
-            _mutex.Set();
+            TexturesLoaded = true;
         }
 
         public (Point position, bool mirrored) GetSpritePositionByDefinition(SpriteDefinition definition)
@@ -99,17 +99,13 @@ namespace LatronArs.WebClient.Services
 
         public async Task<(WebGLTexture texture, WebGLTexture mask)> GetSpriteTexturesAsync(WebGLContext gl)
         {
-            await Task.Run(() => _mutex.WaitOne());
-            var textureData = await _jsRuntime.InvokeAsync<ImageData>("texture.getTexture", 0, 0, Width, Height);
-            var maskData = await _jsRuntime.InvokeAsync<ImageData>("texture.getTexture", 0, Height, Width, Height);
-
             var texture = await gl.CreateTextureAsync();
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, texture);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_S, 0x812F);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 0x812F);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 0x2600);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 0x2600);
-            await gl.TexImage2DAsync(Texture2DType.TEXTURE_2D, 0, PixelFormat.RGBA, Width, Height, PixelFormat.RGBA, PixelType.UNSIGNED_BYTE, textureData.Data);
+            var obj = await _jsRuntime.InvokeAsync<object>("texture.buildTexture", gl.Canvas);
 
             var mask = await gl.CreateTextureAsync();
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, mask);
@@ -117,23 +113,9 @@ namespace LatronArs.WebClient.Services
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_WRAP_T, 0x812F);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MAG_FILTER, 0x2600);
             await gl.TexParameterAsync(TextureType.TEXTURE_2D, TextureParameter.TEXTURE_MIN_FILTER, 0x2600);
-            await gl.TexImage2DAsync(Texture2DType.TEXTURE_2D, 0, PixelFormat.RGBA, Width, Height, PixelFormat.RGBA, PixelType.UNSIGNED_BYTE, maskData.Data);
+            await _jsRuntime.InvokeAsync<object>("texture.buildMask", gl.Canvas);
 
             return (texture, mask);
-        }
-
-        protected virtual void Dispose(bool dispose)
-        {
-            if (dispose)
-            {
-                _mutex.Dispose();
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Engine.Scene.Components;
 using LatronArs.Engine.Scene.Objects.Structs;
 using LatronArs.WebClient.Services.Interfaces;
+using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Helpers
 {
@@ -17,22 +19,38 @@ namespace LatronArs.WebClient.Helpers
             await gl.ShaderSourceAsync(vertexShader, vertex);
             await gl.CompileShaderAsync(vertexShader);
 
+            if (!await gl.GetShaderParameterAsync<bool>(vertexShader, ShaderParameter.COMPILE_STATUS))
+            {
+                string info = await gl.GetShaderInfoLogAsync(vertexShader);
+                await gl.DeleteShaderAsync(vertexShader);
+                throw new Exception("An error occured while compiling the vertex shader: " + info);
+            }
+
             var fragmentShader = await gl.CreateShaderAsync(ShaderType.FRAGMENT_SHADER);
             await gl.ShaderSourceAsync(fragmentShader, fragment);
             await gl.CompileShaderAsync(fragmentShader);
 
+            if (!await gl.GetShaderParameterAsync<bool>(fragmentShader, ShaderParameter.COMPILE_STATUS))
+            {
+                string info = await gl.GetShaderInfoLogAsync(fragmentShader);
+                await gl.DeleteShaderAsync(fragmentShader);
+                throw new Exception("An error occured while compiling the fragment shader: " + info);
+            }
+
             await gl.AttachShaderAsync(program, vertexShader);
             await gl.AttachShaderAsync(program, fragmentShader);
             await gl.LinkProgramAsync(program);
-            if (await gl.GetProgramParameterAsync<bool>(program, ProgramParameter.LINK_STATUS))
+
+            if (!await gl.GetProgramParameterAsync<bool>(program, ProgramParameter.LINK_STATUS))
             {
-                return program;
+                string info = await gl.GetProgramInfoLogAsync(program);
+                throw new Exception("An error occured while linking the program: " + info);
             }
 
-            throw new Exception("Shader program is not compiled");
+            return program;
         }
 
-        public static void FillLight(byte[] backgrounds, byte r, byte g, byte b, int texturePosition)
+        public static void FillLight(int[] backgrounds, int r, int g, int b, int texturePosition)
         {
             backgrounds[texturePosition * 4] = r;
             backgrounds[(texturePosition * 4) + 1] = g;
@@ -41,12 +59,12 @@ namespace LatronArs.WebClient.Helpers
         }
 
         public static void FillColor(
-            byte[] colors,
-            byte[] masks,
-            byte r,
-            byte g,
-            byte b,
-            byte a,
+            int[] colors,
+            int[] masks,
+            int r,
+            int g,
+            int b,
+            int a,
             bool shines,
             bool silhouette,
             bool active,
@@ -106,15 +124,15 @@ namespace LatronArs.WebClient.Helpers
             float[] vertexPositions,
             int x,
             int y,
-            double cameraLeft,
-            double cameraTop,
+            int cameraLeft,
+            int cameraTop,
             int tileWidth,
             int tileHeight,
             int tileHeightOffset,
             int texturePosition)
         {
-            var canvasX = (int)((x - cameraLeft) * tileWidth);
-            var canvasY = (int)((y - cameraTop) * tileHeight);
+            var canvasX = (x - cameraLeft) * tileWidth;
+            var canvasY = (y - cameraTop) * tileHeight;
             vertexPositions[texturePosition * 12] = canvasX;
             vertexPositions[(texturePosition * 12) + 1] = canvasY - tileHeightOffset;
             vertexPositions[(texturePosition * 12) + 2] = canvasX + tileWidth;
@@ -135,9 +153,9 @@ namespace LatronArs.WebClient.Helpers
             float[] vertexPositions,
             float[] textureMapping,
             float[] backgroundTextureMapping,
-            byte[] colors,
-            byte[] backgrounds,
-            byte[] masks,
+            int[] colors,
+            int[] backgrounds,
+            int[] masks,
             WebGLTexture texture,
             WebGLTexture mask,
             int width,
@@ -209,8 +227,8 @@ namespace LatronArs.WebClient.Helpers
             await gl.BindBufferAsync(BufferType.ARRAY_BUFFER, backgroundTexcoordBuffer);
             await gl.VertexAttribPointerAsync(backgroundTexcoordLocation, 2, DataType.FLOAT, false, 0, 0);
 
-            await gl.UniformAsync(positionResolutionLocation, width, height);
-            await gl.UniformAsync(textureResolutionLocation, textureWidth, textureHeight);
+            await gl.UniformAsync(positionResolutionLocation, (float)width, (float)height);
+            await gl.UniformAsync(textureResolutionLocation, (float)textureWidth, (float)textureHeight);
 
             var colorLocation = await gl.GetUniformLocationAsync(program, "u_color");
             var backgroundLocation = await gl.GetUniformLocationAsync(program, "u_backgroundColor");
@@ -235,8 +253,13 @@ namespace LatronArs.WebClient.Helpers
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, texture);
             await gl.ActiveTextureAsync(Texture.TEXTURE4);
             await gl.BindTextureAsync(TextureType.TEXTURE_2D, mask);
+            await gl.BlendFuncAsync(BlendingMode.SRC_ALPHA, BlendingMode.ONE_MINUS_SRC_ALPHA);
 
-            await gl.DrawArraysAsync(Primitive.TRIANGLES, 0, vertexPositions.Length / 2);
+            var lengths = vertexPositions.Length / 2 / colorsHeight;
+            for (var i = 0; i < colorsHeight - 10; i++)
+            {
+                await gl.DrawArraysAsync(Primitive.TRIANGLES, i * lengths, lengths);
+            }
         }
     }
 }

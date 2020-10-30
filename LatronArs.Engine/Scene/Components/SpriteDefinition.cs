@@ -11,8 +11,6 @@ namespace LatronArs.Engine.Scene.Components
 
         public AIState State { get; set; }
 
-        public bool HasItems { get; set; }
-
         public Color Color { get; set; }
     }
 }

@@ -60,9 +60,9 @@ namespace LatronArs.WebClient.Pages.Scene
         private float[] textureMapping;
         private float[] backgroundTextureMapping;
         private float[] vertexes;
-        private byte[] colors;
-        private byte[] backgroundColors;
-        private byte[] masks;
+        private int[] colors;
+        private int[] backgroundColors;
+        private int[] masks;
 
         private double CameraX { get; set; }
 
@@ -80,17 +80,20 @@ namespace LatronArs.WebClient.Pages.Scene
             var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
             var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
             _program = await WebGLHelper.CompileProgram(_pictureContext, vertexShader, fragmentShader);
-            var (texture, mask) = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
-            _spritesTexture = texture;
-            _masksTexture = mask;
+            updatingStopwatch = new Stopwatch();
             await SetupAspectRatio();
 
-            updatingStopwatch = new Stopwatch();
             timer = new Timer(
-                state => ((SceneComponent)state).Redraw().Start(),
+                state =>
+                {
+                    InvokeAsync(async () =>
+                    {
+                        await ((SceneComponent)state).Redraw();
+                    });
+                },
                 this,
                 0,
-                33);
+                3300);
         }
 
         private async Task SetupAspectRatio()
@@ -131,8 +134,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 {
                     Name = "empty",
                     Direction = Direction.Right,
-                    State = AIState.Neutral,
-                    HasItems = false
+                    State = AIState.Neutral
                 },
                 texturePosition);
             WebGLHelper.FillColor(colors, masks, 0, 0, 0, 0, shines, false, false, texturePosition);
@@ -149,10 +151,9 @@ namespace LatronArs.WebClient.Pages.Scene
                     Name = "empty",
                     Direction = Direction.Right,
                     State = AIState.Neutral,
-                    HasItems = false,
                 },
                 texturePosition);
-            WebGLHelper.FillLight(colors, 255, 255, 255, texturePosition);
+            WebGLHelper.FillLight(backgroundColors, 255, 255, 255, texturePosition);
         }
 
         private void FillPoint(
@@ -179,14 +180,14 @@ namespace LatronArs.WebClient.Pages.Scene
                         sprite.Color.G,
                         sprite.Color.B,
                         255,
-                        sprite.HasItems,
+                        memoryVal.HasItems,
                         !memoryVal.Visible,
                         false,
                         texturePosition);
                 }
                 else
                 {
-                    FillEmptyActor(texturePosition, sprite.HasItems);
+                    FillEmptyActor(texturePosition, memoryVal.HasItems);
                 }
 
                 if (memoryVal.Visible)
@@ -204,7 +205,7 @@ namespace LatronArs.WebClient.Pages.Scene
                         backgroundTextureMapping,
                         tileSprite,
                         texturePosition);
-                    WebGLHelper.FillLight(colors, (byte)(light.Color.R * light.Power), (byte)(light.Color.G * light.Power), (byte)(light.Color.B * light.Power), texturePosition);
+                    WebGLHelper.FillLight(backgroundColors, (byte)(light.Color.R * light.Power), (byte)(light.Color.G * light.Power), (byte)(light.Color.B * light.Power), texturePosition);
                 }
                 else
                 {
@@ -222,7 +223,14 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             var time = updatingStopwatch.ElapsedMilliseconds;
             updatingStopwatch.Restart();
-            if (GameService.CurrentScene == null)
+            if (_spritesTexture == null && SpritesService.TexturesLoaded)
+            {
+                var (texture, mask) = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
+                _spritesTexture = texture;
+                _masksTexture = mask;
+            }
+
+            if (GameService.CurrentScene == null || _spritesTexture == null)
             {
                 return;
             }
@@ -248,10 +256,10 @@ namespace LatronArs.WebClient.Pages.Scene
             if (scene.Changed && scene.Player != null)
             {
                 textureMapping = new float[width * height * 12];
-                colors = new byte[width * height * 4];
-                masks = new byte[width * height * 4];
+                colors = new int[width * height * 4];
+                masks = new int[width * height * 4];
                 backgroundTextureMapping = new float[width * height * 12];
-                backgroundColors = new byte[width * height * 4];
+                backgroundColors = new int[width * height * 4];
                 vertexes = new float[width * height * 12];
                 var texturePosition = 0;
                 for (var y = top; y <= bottom; y++)
@@ -261,6 +269,7 @@ namespace LatronArs.WebClient.Pages.Scene
                         WebGLHelper.FillVertexPosition(vertexes, x, y, left, top, TileSize, TileSize, TileOffset, texturePosition);
                         if (x >= 0 && y >= 0 && x < scene.Width && y < scene.Height)
                         {
+                            FillPoint(x, y, texturePosition);
                         }
                         else
                         {
@@ -284,10 +293,10 @@ namespace LatronArs.WebClient.Pages.Scene
                 masks,
                 _spritesTexture,
                 _masksTexture,
-                (int)((left - cameraLeft) * TileSize),
-                (int)((top - cameraTop - 1) * TileSize),
                 (right - left + 1) * TileSize,
                 (bottom - top + 1) * TileSize,
+                (int)((left - cameraLeft) * TileSize),
+                (int)((top - cameraTop - 1) * TileSize),
                 right - left + 1,
                 bottom - top + 1,
                 SpritesService.Width,

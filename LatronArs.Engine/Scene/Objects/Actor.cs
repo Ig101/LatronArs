@@ -69,9 +69,10 @@ namespace LatronArs.Engine.Scene.Objects
             Name = string.Intern(Info.Sprite),
             State = AIState,
             Direction = Direction,
-            HasItems = Treasures.Any(x => x.Shines) || Parent.Treasures.Any(x => x.Shines),
             Color = Info.Color
         };
+
+        public bool HasItems => Treasures.Any(x => x.Shines) || Parent.Treasures.Any(x => x.Shines);
 
         public Actor(
             Tile parent,
@@ -123,6 +124,7 @@ namespace LatronArs.Engine.Scene.Objects
                 Sprite = actor.Sprite,
                 LightLevel = 0,
                 Team = actor.Team,
+                HasItems = actor.HasItems
             };
         }
 
@@ -142,7 +144,8 @@ namespace LatronArs.Engine.Scene.Objects
                             Sprite = tile.Actor?.Sprite,
                             LightLevel = 1,
                             Team = tile.Actor?.Team ?? 0,
-                            Visible = true
+                            Visible = true,
+                            HasItems = (tile.Actor?.HasItems ?? false) || (tile.Treasures.Count > 0)
                         };
                     }
                 }

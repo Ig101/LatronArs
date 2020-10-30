@@ -15,6 +15,8 @@ namespace LatronArs.WebClient.Services.Interfaces
 
         int Width { get; }
 
+        bool TexturesLoaded { get; }
+
         (Point position, bool mirrored) GetSpritePositionByDefinition(SpriteDefinition definition);
 
         Task<(WebGLTexture texture, WebGLTexture mask)> GetSpriteTexturesAsync(WebGLContext gl);

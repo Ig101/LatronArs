@@ -11,5 +11,7 @@ namespace LatronArs.Engine.Scene.Objects.Structs
         public int Team { get; set; }
 
         public bool Visible { get; set; }
+
+        public bool HasItems { get; set; }
     }
 }
