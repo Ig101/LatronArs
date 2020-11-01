@@ -12,6 +12,7 @@ function toFloat32Array(array) {
 var currentCanvasId;
 var currentContext;
 var currentVertices;
+var currentMaskPositions;
 var currentForegrounds;
 var currentBackgrounds;
 var currentColors;
@@ -57,12 +58,13 @@ sceneExtensions = {
         scenePrograms[id] = program;
         contexts[id] = gl;
     },
-    setupContext: function(id) {
+    setupContextAndVertices: function(id, vertices) {
+        currentVertices = toFloat32Array(vertices);
         currentContext = contexts[id];
         currentCanvasId = id;
     },
-    setupVertices: function(vertices, foregrounds, backgrounds) {
-        currentVertices = toFloat32Array(vertices);
+    setupPositions: function(maskPositions, foregrounds, backgrounds) {
+        currentMaskPositions = toFloat32Array(maskPositions);
         currentForegrounds = toFloat32Array(foregrounds);
         currentBackgrounds = toFloat32Array(backgrounds);
     },
@@ -90,12 +92,17 @@ sceneExtensions = {
         gl.clearColor(0, 0, 0, 1);
 
         var positionLocation = gl.getAttribLocation(program, 'a_position');
+        var maskPositionLocation = gl.getAttribLocation(program, 'a_maskPosition');
         var texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
         var backgroundTexcoordLocation = gl.getAttribLocation(program, 'a_backgroundTexCoord');
       
         var positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, currentVertices, gl.STATIC_DRAW);
+
+        var maskPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, maskPositionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, currentMaskPositions, gl.STATIC_DRAW);
       
         var texcoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
@@ -138,6 +145,10 @@ sceneExtensions = {
         gl.enableVertexAttribArray(positionLocation);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        gl.enableVertexAttribArray(maskPositionLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, maskPositionBuffer);
+        gl.vertexAttribPointer(maskPositionLocation, 2, gl.FLOAT, false, 0, 0);
       
         gl.enableVertexAttribArray(texcoordLocation);
         gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);

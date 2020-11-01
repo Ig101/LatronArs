@@ -9,12 +9,12 @@ uniform sampler2D u_mask;
 
 varying vec2 v_texCoord;
 varying vec2 v_backgroundTexCoord;
-varying vec2 v_position;
+varying vec2 v_maskPosition;
 
 void main() {
-    vec4 color = texture2D(u_color, v_position);
-    vec3 backgroundColor = texture2D(u_backgroundColor, v_position).rgb;
-    vec4 mask = texture2D(u_maskMap, v_position);
+    vec4 color = texture2D(u_color, v_maskPosition);
+    vec3 backgroundColor = texture2D(u_backgroundColor, v_maskPosition).rgb;
+    vec4 mask = texture2D(u_maskMap, v_maskPosition);
 
     vec4 textureColor = texture2D(u_texture, v_texCoord);
     vec4 maskTextureColor = texture2D(u_mask, v_texCoord);
@@ -36,7 +36,7 @@ void main() {
             (1.0 - shinesAlpha) * (maskTextureColor.g * color.r * backgroundColor.r) + shinesAlpha,
             (1.0 - shinesAlpha) * (maskTextureColor.g * color.g * backgroundColor.g) + shinesAlpha,
             (1.0 - shinesAlpha) * (maskTextureColor.g * color.b * backgroundColor.b) + shinesAlpha,
-            max(shinesAlpha, max(maskTextureColor.g, backgroundTextureColor.a))
+            max(shinesAlpha, max(textureColor.a, backgroundTextureColor.a))
         );
     } else if (mask.a != 0.0) {
         gl_FragColor = vec4(

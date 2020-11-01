@@ -50,6 +50,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private BoundingClientRect canvasSize;
         private float[] textureMapping;
         private float[] backgroundTextureMapping;
+        private float[] maskPositions;
         private float[] vertexes;
         private byte[] colors;
         private byte[] backgroundColors;
@@ -240,13 +241,14 @@ namespace LatronArs.WebClient.Pages.Scene
                 masks = new byte[width * height * 4];
                 backgroundTextureMapping = new float[width * height * 12];
                 backgroundColors = new byte[width * height * 4];
+                maskPositions = new float[width * height * 12];
                 vertexes = new float[width * height * 12];
                 var texturePosition = 0;
                 for (var y = top; y <= bottom; y++)
                 {
                     for (var x = left; x <= right; x++)
                     {
-                        WebGLHelper.FillVertexPosition(vertexes, x, y, left, top, TileSize, TileSize, TileOffset, texturePosition);
+                        WebGLHelper.FillVertexPosition(vertexes, maskPositions, x, y, left, top, TileSize, TileSize, TileOffset, texturePosition);
                         if (x >= 0 && y >= 0 && x < scene.Width && y < scene.Height)
                         {
                             FillPoint(x, y, texturePosition);
@@ -266,6 +268,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 JSRuntime,
                 PictureCanvasRef,
                 vertexes,
+                maskPositions,
                 textureMapping,
                 backgroundTextureMapping,
                 colors,
@@ -280,7 +283,6 @@ namespace LatronArs.WebClient.Pages.Scene
                 SpritesService.Width,
                 SpritesService.SpriteHeight);
 
-            Console.WriteLine(updatingStopwatch.ElapsedMilliseconds);
             scene.Changed = false;
         }
 

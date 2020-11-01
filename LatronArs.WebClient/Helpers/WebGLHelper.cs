@@ -83,6 +83,7 @@ namespace LatronArs.WebClient.Helpers
 
         public static void FillVertexPosition(
             float[] vertexPositions,
+            float[] maskPositions,
             int x,
             int y,
             int cameraLeft,
@@ -106,12 +107,26 @@ namespace LatronArs.WebClient.Helpers
             vertexPositions[(texturePosition * 12) + 9] = canvasY - tileHeightOffset;
             vertexPositions[(texturePosition * 12) + 10] = canvasX + tileWidth;
             vertexPositions[(texturePosition * 12) + 11] = canvasY + tileHeight;
+
+            maskPositions[texturePosition * 12] = canvasX;
+            maskPositions[(texturePosition * 12) + 1] = canvasY;
+            maskPositions[(texturePosition * 12) + 2] = canvasX + tileWidth;
+            maskPositions[(texturePosition * 12) + 3] = canvasY;
+            maskPositions[(texturePosition * 12) + 4] = canvasX;
+            maskPositions[(texturePosition * 12) + 5] = canvasY + tileHeight;
+            maskPositions[(texturePosition * 12) + 6] = canvasX;
+            maskPositions[(texturePosition * 12) + 7] = canvasY + tileHeight;
+            maskPositions[(texturePosition * 12) + 8] = canvasX + tileWidth;
+            maskPositions[(texturePosition * 12) + 9] = canvasY;
+            maskPositions[(texturePosition * 12) + 10] = canvasX + tileWidth;
+            maskPositions[(texturePosition * 12) + 11] = canvasY + tileHeight;
         }
 
         public static void DrawArrays(
             IJSRuntime jsRuntime,
             ElementReference canvas,
             float[] vertexPositions,
+            float[] maskPositions,
             float[] textureMapping,
             float[] backgroundTextureMapping,
             byte[] colors,
@@ -129,8 +144,8 @@ namespace LatronArs.WebClient.Helpers
             if (jsRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
             {
                 var canvasId = int.Parse(canvas.Id);
-                webAssemblyJSRuntime.InvokeUnmarshalled<int, object>("sceneExtensions.setupContext", canvasId);
-                webAssemblyJSRuntime.InvokeUnmarshalled<float[], float[], float[], object>("sceneExtensions.setupVertices", vertexPositions, textureMapping, backgroundTextureMapping);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, float[], object>("sceneExtensions.setupContextAndVertices", canvasId, vertexPositions);
+                webAssemblyJSRuntime.InvokeUnmarshalled<float[], float[], float[], object>("sceneExtensions.setupPositions", maskPositions, textureMapping, backgroundTextureMapping);
                 webAssemblyJSRuntime.InvokeUnmarshalled<byte[], byte[], byte[], object>("sceneExtensions.setupColors", colors, backgrounds, masks);
                 webAssemblyJSRuntime.InvokeUnmarshalled<int, int, int, object>("sceneExtensions.setupXAxle", cameraX, colorsWidth, textureWidth);
                 webAssemblyJSRuntime.InvokeUnmarshalled<int, int, int, object>("sceneExtensions.setupYAxle", cameraY, colorsHeight, textureHeight);
