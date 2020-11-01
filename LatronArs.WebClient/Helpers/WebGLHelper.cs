@@ -1,56 +1,17 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Engine.Scene.Components;
 using LatronArs.Engine.Scene.Objects.Structs;
 using LatronArs.WebClient.Services.Interfaces;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Helpers
 {
     public static class WebGLHelper
     {
-        public static async Task<WebGLProgram> CompileProgram(WebGLContext gl, string vertex, string fragment)
-        {
-            var program = await gl.CreateProgramAsync();
-
-            var vertexShader = await gl.CreateShaderAsync(ShaderType.VERTEX_SHADER);
-            await gl.ShaderSourceAsync(vertexShader, vertex);
-            await gl.CompileShaderAsync(vertexShader);
-
-            if (!await gl.GetShaderParameterAsync<bool>(vertexShader, ShaderParameter.COMPILE_STATUS))
-            {
-                string info = await gl.GetShaderInfoLogAsync(vertexShader);
-                await gl.DeleteShaderAsync(vertexShader);
-                throw new Exception("An error occured while compiling the vertex shader: " + info);
-            }
-
-            var fragmentShader = await gl.CreateShaderAsync(ShaderType.FRAGMENT_SHADER);
-            await gl.ShaderSourceAsync(fragmentShader, fragment);
-            await gl.CompileShaderAsync(fragmentShader);
-
-            if (!await gl.GetShaderParameterAsync<bool>(fragmentShader, ShaderParameter.COMPILE_STATUS))
-            {
-                string info = await gl.GetShaderInfoLogAsync(fragmentShader);
-                await gl.DeleteShaderAsync(fragmentShader);
-                throw new Exception("An error occured while compiling the fragment shader: " + info);
-            }
-
-            await gl.AttachShaderAsync(program, vertexShader);
-            await gl.AttachShaderAsync(program, fragmentShader);
-            await gl.LinkProgramAsync(program);
-
-            if (!await gl.GetProgramParameterAsync<bool>(program, ProgramParameter.LINK_STATUS))
-            {
-                string info = await gl.GetProgramInfoLogAsync(program);
-                throw new Exception("An error occured while linking the program: " + info);
-            }
-
-            return program;
-        }
-
-        public static void FillLight(int[] backgrounds, int r, int g, int b, int texturePosition)
+        public static void FillLight(byte[] backgrounds, byte r, byte g, byte b, int texturePosition)
         {
             backgrounds[texturePosition * 4] = r;
             backgrounds[(texturePosition * 4) + 1] = g;
@@ -59,12 +20,12 @@ namespace LatronArs.WebClient.Helpers
         }
 
         public static void FillColor(
-            int[] colors,
-            int[] masks,
-            int r,
-            int g,
-            int b,
-            int a,
+            byte[] colors,
+            byte[] masks,
+            byte r,
+            byte g,
+            byte b,
+            byte a,
             bool shines,
             bool silhouette,
             bool active,
@@ -147,8 +108,40 @@ namespace LatronArs.WebClient.Helpers
             vertexPositions[(texturePosition * 12) + 11] = canvasY + tileHeight;
         }
 
-        public static async Task DrawArrays(
-            WebGLContext gl,
+        public static void DrawArrays(
+            IJSRuntime jsRuntime,
+            ElementReference canvas,
+            float[] vertexPositions,
+            float[] textureMapping,
+            float[] backgroundTextureMapping,
+            byte[] colors,
+            byte[] backgrounds,
+            byte[] masks,
+            int width,
+            int height,
+            int cameraX,
+            int cameraY,
+            int colorsWidth,
+            int colorsHeight,
+            int textureWidth,
+            int textureHeight)
+        {
+            if (jsRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
+            {
+                var canvasId = int.Parse(canvas.Id);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, object>("sceneExtensions.setupContext", canvasId);
+                webAssemblyJSRuntime.InvokeUnmarshalled<float[], float[], float[], object>("sceneExtensions.setupVertices", vertexPositions, textureMapping, backgroundTextureMapping);
+                webAssemblyJSRuntime.InvokeUnmarshalled<byte[], byte[], byte[], object>("sceneExtensions.setupColors", colors, backgrounds, masks);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, int, int, object>("sceneExtensions.setupXAxle", cameraX, colorsWidth, textureWidth);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, int, int, object>("sceneExtensions.setupYAxle", cameraY, colorsHeight, textureHeight);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, int, object>("sceneExtensions.draw", width, height);
+             /*   webAssemblyJSRuntime.InvokeUnmarshalled<byte[], byte[], byte[], object>("downloadByteArray", bytes, bytes2, bytes3);
+             //   webAssemblyJSRuntime.InvokeUnmarshalled<float[], float[], float[], object>("downloadFloatArray", vertexes, textureMapping, backgroundTextureMapping);
+                webAssemblyJSRuntime.InvokeUnmarshalled<int, int, int, object>("downloadFloatValues", (right - left + 1) * TileSize, (bottom - top + 1) * TileSize, (int)((left - cameraLeft) * TileSize));*/
+            }
+        }
+
+      /*      WebGLContext gl,
             WebGLProgram program,
             float[] vertexPositions,
             float[] textureMapping,
@@ -165,9 +158,8 @@ namespace LatronArs.WebClient.Helpers
             int colorsWidth,
             int colorsHeight,
             int textureWidth,
-            int textureHeight)
-        {
-            await gl.ClearColorAsync(0, 0, 0, 1);
+            int textureHeight)*/
+            /*await gl.ClearColorAsync(0, 0, 0, 1);
 
             uint positionLocation = (uint)await gl.GetAttribLocationAsync(program, "a_position");
             uint texcoordLocation = (uint)await gl.GetAttribLocationAsync(program, "a_texCoord");
@@ -257,7 +249,6 @@ namespace LatronArs.WebClient.Helpers
             await gl.BlendFuncAsync(BlendingMode.SRC_ALPHA, BlendingMode.ONE_MINUS_SRC_ALPHA);
 
             var lengths = vertexPositions.Length / 2;
-            await gl.DrawArraysAsync(Primitive.TRIANGLES, 0, lengths);
-        }
+            await gl.DrawArraysAsync(Primitive.TRIANGLES, 0, lengths);*/
     }
 }

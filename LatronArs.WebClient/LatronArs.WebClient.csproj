@@ -8,7 +8,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.0-rc.2.20475.17" PrivateAssets="all" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0-rc.2.20475.5" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
-    <PackageReference Include="Blazor.Extensions.Canvas" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LatronArs.Models\LatronArs.Models.csproj" />

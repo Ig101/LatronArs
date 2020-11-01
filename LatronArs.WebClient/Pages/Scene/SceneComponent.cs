@@ -5,9 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Blazor.Extensions;
-using Blazor.Extensions.Canvas.Canvas2D;
-using Blazor.Extensions.Canvas.WebGL;
 using LatronArs.Models.Enums;
 using LatronArs.WebClient.Helpers;
 using LatronArs.WebClient.Models;
@@ -41,17 +38,11 @@ namespace LatronArs.WebClient.Pages.Scene
         [Inject]
         private HttpClient HttpClient { get; set; }
 
-        protected BECanvasComponent PictureCanvasRef { get; set; }
+        protected ElementReference PictureCanvasRef { get; set; }
 
-        protected BECanvasComponent HudCanvasRef { get; set; }
+        protected int CanvasWidth { get; set; }
 
-        protected ElementReference PictureContainer { get; set; }
-
-        private WebGLContext _pictureContext;
-        private Canvas2DContext _hudContext;
-        private WebGLProgram _program;
-        private WebGLTexture _spritesTexture;
-        private WebGLTexture _masksTexture;
+        protected int CanvasHeight { get; set; }
 
         private double zoom;
         private Stopwatch updatingStopwatch;
@@ -60,9 +51,9 @@ namespace LatronArs.WebClient.Pages.Scene
         private float[] textureMapping;
         private float[] backgroundTextureMapping;
         private float[] vertexes;
-        private int[] colors;
-        private int[] backgroundColors;
-        private int[] masks;
+        private byte[] colors;
+        private byte[] backgroundColors;
+        private byte[] masks;
 
         private double CameraX { get; set; }
 
@@ -74,23 +65,15 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             ResizeService.OnResize += SetupAspectRatio;
 
-            _pictureContext = await PictureCanvasRef.CreateWebGLAsync();
-            _hudContext = await HudCanvasRef.CreateCanvas2DAsync();
-
             var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
             var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
-            _program = await WebGLHelper.CompileProgram(_pictureContext, vertexShader, fragmentShader);
+            await JSRuntime.InvokeAsync<object>("sceneExtensions.registerWebGLContext", PictureCanvasRef, vertexShader, fragmentShader);
+            await SpritesService.BuildSpriteTexturesAsync(PictureCanvasRef);
             updatingStopwatch = new Stopwatch();
             await SetupAspectRatio();
 
             timer = new Timer(
-                state =>
-                {
-                    InvokeAsync(async () =>
-                    {
-                        await ((SceneComponent)state).Redraw();
-                    });
-                },
+                state => ((SceneComponent)state).Redraw(),
                 this,
                 0,
                 3300);
@@ -98,29 +81,27 @@ namespace LatronArs.WebClient.Pages.Scene
 
         private async Task SetupAspectRatio()
         {
-            canvasSize = await JSRuntime.InvokeAsync<BoundingClientRect>("DOMGetBoundingClientRect", PictureContainer);
+            canvasSize = await JSRuntime.InvokeAsync<BoundingClientRect>("DOMGetBoundingClientRect", PictureCanvasRef);
             var newAspectRatio = canvasSize.Width / canvasSize.Height;
-            var canvasSizeParams = newAspectRatio < DefaultAspectRatio ?
-                new Dictionary<string, object>()
-                {
-                    { "Width", (long)DefaultWidth },
-                    { "Height", (long)(DefaultWidth / newAspectRatio) }
-                }
-                :
-                new Dictionary<string, object>()
-                {
-                    { "Width", (long)(DefaultHeight * newAspectRatio) },
-                    { "Height", (long)DefaultHeight }
-                };
-            await PictureCanvasRef.SetParametersAsync(ParameterView.FromDictionary(canvasSizeParams));
-            await HudCanvasRef.SetParametersAsync(ParameterView.FromDictionary(canvasSizeParams));
-            zoom = canvasSize.Width / (long)canvasSizeParams["Width"];
+            if (newAspectRatio < DefaultAspectRatio)
+            {
+                CanvasWidth = DefaultWidth;
+                CanvasHeight = (int)(DefaultWidth / newAspectRatio);
+                zoom = canvasSize.Width / CanvasWidth;
+            }
+            else
+            {
+                CanvasWidth = (int)(DefaultHeight * newAspectRatio);
+                CanvasHeight = DefaultHeight;
+                zoom = canvasSize.Height / CanvasHeight;
+            }
+
             if (GameService.CurrentScene != null)
             {
                 GameService.CurrentScene.Changed = true;
             }
 
-            await Redraw();
+            Redraw();
         }
 
         private void FillEmptyActor(
@@ -219,18 +200,11 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
-        private async Task Redraw()
+        private void Redraw()
         {
             var time = updatingStopwatch.ElapsedMilliseconds;
             updatingStopwatch.Restart();
-            if (_spritesTexture == null && SpritesService.TexturesLoaded)
-            {
-                var (texture, mask) = await SpritesService.GetSpriteTexturesAsync(_pictureContext);
-                _spritesTexture = texture;
-                _masksTexture = mask;
-            }
-
-            if (GameService.CurrentScene == null || _spritesTexture == null)
+            if (GameService.CurrentScene == null || !SpritesService.TexturesBuilt)
             {
                 return;
             }
@@ -256,10 +230,10 @@ namespace LatronArs.WebClient.Pages.Scene
             if (scene.Changed && scene.Player != null)
             {
                 textureMapping = new float[width * height * 12];
-                colors = new int[width * height * 4];
-                masks = new int[width * height * 4];
+                colors = new byte[width * height * 4];
+                masks = new byte[width * height * 4];
                 backgroundTextureMapping = new float[width * height * 12];
-                backgroundColors = new int[width * height * 4];
+                backgroundColors = new byte[width * height * 4];
                 vertexes = new float[width * height * 12];
                 var texturePosition = 0;
                 for (var y = top; y <= bottom; y++)
@@ -282,17 +256,18 @@ namespace LatronArs.WebClient.Pages.Scene
                 }
             }
 
-            await WebGLHelper.DrawArrays(
-                _pictureContext,
-                _program,
+            Console.WriteLine(updatingStopwatch.ElapsedMilliseconds);
+            scene.Changed = false;
+
+            WebGLHelper.DrawArrays(
+                JSRuntime,
+                PictureCanvasRef,
                 vertexes,
                 textureMapping,
                 backgroundTextureMapping,
                 colors,
                 backgroundColors,
                 masks,
-                _spritesTexture,
-                _masksTexture,
                 (right - left + 1) * TileSize,
                 (bottom - top + 1) * TileSize,
                 (int)((left - cameraLeft) * TileSize),
@@ -301,8 +276,6 @@ namespace LatronArs.WebClient.Pages.Scene
                 bottom - top + 1,
                 SpritesService.Width,
                 SpritesService.SpriteHeight);
-
-            scene.Changed = false;
         }
 
         protected virtual void Dispose(bool disposing)
