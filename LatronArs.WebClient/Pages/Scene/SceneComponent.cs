@@ -11,15 +11,16 @@ using LatronArs.WebClient.Models;
 using LatronArs.WebClient.Services;
 using LatronArs.WebClient.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Pages.Scene
 {
     public class SceneComponent : ComponentBase, IDisposable
     {
-        private const int DefaultWidth = 800;
+        private const int DefaultWidth = 760;
         private const int DefaultHeight = 540;
-        private const int DefaultAspectRatio = DefaultWidth / DefaultHeight;
+        private const float DefaultAspectRatio = (float)DefaultWidth / DefaultHeight;
         private const int TileSize = 30;
         private const int TileOffset = 8;
 
@@ -33,7 +34,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private IJSRuntime JSRuntime { get; set; }
 
         [Inject]
-        private ResizeService ResizeService { get; set; }
+        private EventsService ResizeService { get; set; }
 
         [Inject]
         private HttpClient HttpClient { get; set; }
@@ -67,7 +68,9 @@ namespace LatronArs.WebClient.Pages.Scene
             Console.WriteLine(firstRender);
             if (firstRender)
             {
-                ResizeService.OnResize += SetupAspectRatio;
+                EventsService.OnResize += SetupAspectRatio;
+                EventsService.OnKeyDown += OnKeyDown;
+                EventsService.OnKeyUp += OnKeyUp;
 
                 var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
                 var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
@@ -84,6 +87,16 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
+        private void OnKeyDown(KeyboardEvent e)
+        {
+            Console.WriteLine(e.Code);
+        }
+
+        private void OnKeyUp(KeyboardEvent e)
+        {
+            Console.WriteLine(e.Code);
+        }
+
         private async Task SetupAspectRatio()
         {
             canvasSize = await JSRuntime.InvokeAsync<BoundingClientRect>("DOMGetBoundingClientRect", PictureCanvasRef);
@@ -92,15 +105,14 @@ namespace LatronArs.WebClient.Pages.Scene
             {
                 CanvasWidth = DefaultWidth;
                 CanvasHeight = (int)(DefaultWidth / newAspectRatio);
-                zoom = canvasSize.Width / CanvasWidth;
             }
             else
             {
                 CanvasWidth = (int)(DefaultHeight * newAspectRatio);
                 CanvasHeight = DefaultHeight;
-                zoom = canvasSize.Height / CanvasHeight;
             }
 
+            zoom = canvasSize.Width / CanvasWidth;
             StateHasChanged();
 
             if (GameService.CurrentScene != null)
@@ -290,7 +302,9 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             if (disposing)
             {
-                ResizeService.OnResize -= SetupAspectRatio;
+                EventsService.OnResize -= SetupAspectRatio;
+                EventsService.OnKeyDown -= OnKeyDown;
+                EventsService.OnKeyUp -= OnKeyUp;
                 timer.Dispose();
             }
         }

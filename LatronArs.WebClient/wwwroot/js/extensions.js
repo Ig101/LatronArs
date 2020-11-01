@@ -1,11 +1,29 @@
 DOMGetBoundingClientRect = (element, parm) => { return element.getBoundingClientRect(); };
 
-browserResize = {
-    registerResizeCallback: function () {
-        window.addEventListener("resize", browserResize.resized);
+eventsExtensions = {
+    registerEventsCallback: function () {
+        window.addEventListener('resize', eventsExtensions.resized);
+        window.addEventListener('keydown', eventsExtensions.keyDowned);
+        window.addEventListener('keyup', eventsExtensions.keyUpped);
+        window.addEventListener('contextmenu', eventsExtensions.contextMenued);
     },
     resized: function () {
-        DotNet.invokeMethodAsync("LatronArs.WebClient", 'PushResize').then(data => data);
+        DotNet.invokeMethodAsync('LatronArs.WebClient', 'PushResize').then(data => data);
+    },
+    keyDowned: function (e) {
+        e.preventDefault();
+        DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyDown', {
+            code: e.code
+        });
+    },
+    keyUpped: function (e) {
+        e.preventDefault();
+        DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyUp', {
+            code: e.code
+        });
+    },
+    contextMenued: function (e) {
+        e.preventDefault();
     }
 }
 

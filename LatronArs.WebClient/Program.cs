@@ -22,7 +22,7 @@ namespace LatronArs.WebClient
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddSingleton<IGameService, GameService>();
             builder.Services.AddSingleton<ISpritesService, SpritesService>();
-            builder.Services.AddSingleton<ResizeService>();
+            builder.Services.AddSingleton<EventsService>();
 
             await builder.Build().RunAsync();
         }
