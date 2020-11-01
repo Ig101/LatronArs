@@ -17,11 +17,11 @@ namespace LatronArs.WebClient.Pages.Scene
 {
     public class SceneComponent : ComponentBase, IDisposable
     {
-        private const int DefaultWidth = 1024;
-        private const int DefaultHeight = 768;
+        private const int DefaultWidth = 700;
+        private const int DefaultHeight = 540;
         private const int DefaultAspectRatio = DefaultWidth / DefaultHeight;
-        private const int TileSize = 62;
-        private const int TileOffset = 16;
+        private const int TileSize = 30;
+        private const int TileOffset = 8;
 
         [Inject]
         private IGameService GameService { get; set; }

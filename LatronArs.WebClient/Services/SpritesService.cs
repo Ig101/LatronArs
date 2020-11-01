@@ -20,9 +20,9 @@ namespace LatronArs.WebClient.Services
         private IJSRuntime _jsRuntime;
         private ICollection<Func<ValueTask<object>>> _buildTasks = new List<Func<ValueTask<object>>>();
 
-        public int SpriteWidth => 62;
+        public int SpriteWidth => 30;
 
-        public int SpriteHeight => 78;
+        public int SpriteHeight => 38;
 
         public int Width { get; private set; }
 

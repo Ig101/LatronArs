@@ -10,6 +10,11 @@
 .battle canvas {
   width: 100%;
   height: 100%;
+  -ms-interpolation-mode: nearest-neighbor;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -o-pixelated;
+      image-rendering: pixelated;
   background-color: #000;
 }
 
