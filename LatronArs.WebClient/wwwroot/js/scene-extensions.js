@@ -3,7 +3,7 @@ var contexts = [];
 var scenePrograms = [];
 
 function toFloat32Array(array) {
-    var m = content1 + 12;
+    var m = array + 12;
     var r = Module.HEAP32[m >> 2]
     return new Float32Array(Module.HEAPF32.buffer, m + 4, r);
 }
@@ -30,7 +30,7 @@ sceneExtensions = {
         const vertexShader = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(vertexShader, vertexCode);
         gl.compileShader(vertexShader);
-        if (gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+        if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
           console.error(gl.getShaderInfoLog(vertexShader));
           gl.deleteShader(vertexShader);
           return;
@@ -39,7 +39,7 @@ sceneExtensions = {
         const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(fragmentShader, fragmentCode);
         gl.compileShader(fragmentShader);
-        if (gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
           console.error(gl.getShaderInfoLog(fragmentShader));
           gl.deleteShader(fragmentShader);
           return;
@@ -119,7 +119,7 @@ sceneExtensions = {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, currentColorsWidth, currentColorsHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, currentBackgrounds);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, currentColorsWidth, currentColorsHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, currentBackgroundColors);
       
         var maskTexture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, maskTexture);

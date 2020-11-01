@@ -63,20 +63,24 @@ namespace LatronArs.WebClient.Pages.Scene
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            ResizeService.OnResize += SetupAspectRatio;
+            Console.WriteLine(firstRender);
+            if (firstRender)
+            {
+                ResizeService.OnResize += SetupAspectRatio;
 
-            var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
-            var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
-            await JSRuntime.InvokeAsync<object>("sceneExtensions.registerWebGLContext", PictureCanvasRef, vertexShader, fragmentShader);
-            await SpritesService.BuildSpriteTexturesAsync(PictureCanvasRef);
-            updatingStopwatch = new Stopwatch();
-            await SetupAspectRatio();
+                var vertexShader = await HttpClient.GetStringAsync("shaders/vertex-shader-2d.vert");
+                var fragmentShader = await HttpClient.GetStringAsync("shaders/fragment-shader-2d.frag");
+                await JSRuntime.InvokeAsync<object>("sceneExtensions.registerWebGLContext", PictureCanvasRef, int.Parse(PictureCanvasRef.Id), vertexShader, fragmentShader);
+                await SpritesService.BuildSpriteTexturesAsync(PictureCanvasRef);
+                updatingStopwatch = new Stopwatch();
+                await SetupAspectRatio();
 
-            timer = new Timer(
-                state => ((SceneComponent)state).Redraw(),
-                this,
-                0,
-                3300);
+                timer = new Timer(
+                    state => ((SceneComponent)state).Redraw(),
+                    this,
+                    0,
+                    33);
+            }
         }
 
         private async Task SetupAspectRatio()
@@ -95,6 +99,8 @@ namespace LatronArs.WebClient.Pages.Scene
                 CanvasHeight = DefaultHeight;
                 zoom = canvasSize.Height / CanvasHeight;
             }
+
+            StateHasChanged();
 
             if (GameService.CurrentScene != null)
             {
@@ -256,9 +262,6 @@ namespace LatronArs.WebClient.Pages.Scene
                 }
             }
 
-            Console.WriteLine(updatingStopwatch.ElapsedMilliseconds);
-            scene.Changed = false;
-
             WebGLHelper.DrawArrays(
                 JSRuntime,
                 PictureCanvasRef,
@@ -276,6 +279,9 @@ namespace LatronArs.WebClient.Pages.Scene
                 bottom - top + 1,
                 SpritesService.Width,
                 SpritesService.SpriteHeight);
+
+            Console.WriteLine(updatingStopwatch.ElapsedMilliseconds);
+            scene.Changed = false;
         }
 
         protected virtual void Dispose(bool disposing)

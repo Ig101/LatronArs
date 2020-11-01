@@ -55,7 +55,6 @@ textureExtensions = {
         });
     },
     buildTextureAndMask: function(canvas, id) {
-        console.log('TMA', id);
         var gl = canvas.getContext('webgl');
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -81,25 +80,4 @@ textureExtensions = {
     getMask: function(id) {
         return sceneMasks[id];
     }
-}
-
-function downloadByteArray(content1, content2, content3) {
-    var j = Blazor.platform.toUint8Array(content1);
-    var j2 = Blazor.platform.toUint8Array(content2);
-    var j3 = Blazor.platform.toUint8Array(content3);
-}
-
-function downloadFloatArray(content1, content2, content3) {
-    var m = content1 + 12;
-    var r = Module.HEAP32[m >> 2]
-    var j = new Float32Array(Module.HEAPF32.buffer, m + 4, r);
-  //  var j2 = Blazor.platform.toFloat32Array(content2);
-  //  var j3 = Blazor.platform.toFloat32Array(content3);
-}
-
-function downloadFloatValues(content1, content2, content3) {
- //   console.log(content1);
-  //  console.log(content2);
-  //  var j2 = Blazor.platform.toFloat32Array(content2);
-  //  var j3 = Blazor.platform.toFloat32Array(content3);
 }
