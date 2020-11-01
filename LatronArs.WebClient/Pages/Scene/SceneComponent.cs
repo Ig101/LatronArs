@@ -17,7 +17,7 @@ namespace LatronArs.WebClient.Pages.Scene
 {
     public class SceneComponent : ComponentBase, IDisposable
     {
-        private const int DefaultWidth = 700;
+        private const int DefaultWidth = 800;
         private const int DefaultHeight = 540;
         private const int DefaultAspectRatio = DefaultWidth / DefaultHeight;
         private const int TileSize = 30;
