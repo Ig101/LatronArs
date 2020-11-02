@@ -5,7 +5,8 @@ eventsExtensions = {
         window.addEventListener('resize', eventsExtensions.resized);
         window.addEventListener('keydown', eventsExtensions.keyDowned);
         window.addEventListener('keyup', eventsExtensions.keyUpped);
-        window.addEventListener('contextmenu', eventsExtensions.contextMenued);
+        window.addEventListener('contextmenu', eventsExtensions.cancelAction);
+        window.addEventListener('onbeforeunload', eventsExtensions.cancelAction);
     },
     resized: function () {
         DotNet.invokeMethodAsync('LatronArs.WebClient', 'PushResize').then(data => data);
@@ -13,7 +14,10 @@ eventsExtensions = {
     keyDowned: function (e) {
         e.preventDefault();
         DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyDown', {
-            code: e.code
+            code: e.code,
+            altKey: e.altKey,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey
         });
     },
     keyUpped: function (e) {
@@ -22,7 +26,7 @@ eventsExtensions = {
             code: e.code
         });
     },
-    contextMenued: function (e) {
+    cancelAction: function (e) {
         e.preventDefault();
     }
 }

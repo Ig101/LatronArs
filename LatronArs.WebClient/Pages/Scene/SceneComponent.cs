@@ -16,7 +16,7 @@ using Microsoft.JSInterop;
 
 namespace LatronArs.WebClient.Pages.Scene
 {
-    public class SceneComponent : ComponentBase, IDisposable
+    public partial class SceneComponent : ComponentBase, IDisposable
     {
         private const int DefaultWidth = 760;
         private const int DefaultHeight = 540;
@@ -57,6 +57,13 @@ namespace LatronArs.WebClient.Pages.Scene
         private byte[] backgroundColors;
         private byte[] masks;
 
+        private IEnumerable<KeyEventHandler<SceneComponent>> keyHandlers;
+        private IList<KeyEventHandler<SceneComponent>> pressedHandlers;
+        private bool shift;
+        private bool alt;
+        private bool ctrl;
+        private long timeTillActionRepeat = 0;
+
         private double CameraX { get; set; }
 
         private double CameraY { get; set; }
@@ -84,17 +91,164 @@ namespace LatronArs.WebClient.Pages.Scene
                     this,
                     0,
                     33);
+
+                pressedHandlers = new List<KeyEventHandler<SceneComponent>>();
+                keyHandlers = new[]
+                {
+                    new KeyEventHandler<SceneComponent>
+                    {
+                        Codes = new[] { "KeyW", "ArrowUp" },
+                        Action = SceneActions.MoveUp,
+                        Hold = true,
+                        ShiftAction = SceneActions.SprintUp,
+                        ShiftHold = true,
+                        CtrlAction = SceneActions.PickupUp,
+                        AltAction = SceneActions.InteractUp
+                    },
+                    new KeyEventHandler<SceneComponent>
+                    {
+                        Codes = new[] { "KeyS", "ArrowDown" },
+                        Action = SceneActions.MoveDown,
+                        Hold = true,
+                        ShiftAction = SceneActions.SprintDown,
+                        ShiftHold = true,
+                        CtrlAction = SceneActions.PickupDown,
+                        AltAction = SceneActions.InteractDown
+                    },
+                    new KeyEventHandler<SceneComponent>
+                    {
+                        Codes = new[] { "KeyA", "ArrowLeft" },
+                        Action = SceneActions.MoveLeft,
+                        Hold = true,
+                        ShiftAction = SceneActions.SprintLeft,
+                        ShiftHold = true,
+                        CtrlAction = SceneActions.PickupLeft,
+                        AltAction = SceneActions.InteractLeft
+                    },
+                    new KeyEventHandler<SceneComponent>
+                    {
+                        Codes = new[] { "KeyD", "ArrowRight" },
+                        Action = SceneActions.MoveRight,
+                        Hold = true,
+                        ShiftAction = SceneActions.SprintRight,
+                        ShiftHold = true,
+                        CtrlAction = SceneActions.PickupRight,
+                        AltAction = SceneActions.InteractRight
+                    },
+                    new KeyEventHandler<SceneComponent>
+                    {
+                        Codes = new[] { "Space" },
+                        Action = SceneActions.PickupCenter,
+                        ShiftAction = SceneActions.PickupCenter,
+                        CtrlAction = SceneActions.PickupCenter,
+                        AltAction = SceneActions.InteractCenter
+                    }
+                };
             }
+        }
+
+        private bool MakeAction(KeyEventHandler<SceneComponent> handler, bool hold)
+        {
+            if (ctrl && handler.CtrlAction != null && handler.CtrlHold == hold)
+            {
+                handler.CtrlAction(this);
+                return true;
+            }
+
+            if (alt && !ctrl && handler.AltAction != null && handler.AltHold == hold)
+            {
+                handler.AltAction(this);
+                return true;
+            }
+
+            if (shift && !alt && !ctrl && handler.ShiftAction != null && handler.ShiftHold == hold)
+            {
+                handler.ShiftAction(this);
+                return true;
+            }
+
+            if (!alt && !ctrl && !shift && handler.Action != null && handler.Hold == hold)
+            {
+                handler.Action(this);
+                return true;
+            }
+
+            return false;
         }
 
         private void OnKeyDown(KeyboardEvent e)
         {
-            Console.WriteLine(e.Code);
+            if (e.Code == "Escape")
+            {
+                return;
+            }
+
+            if (e.Code == "Digit0")
+            {
+                ctrl = true;
+                return;
+            }
+
+            if (e.Code == "Minus")
+            {
+                alt = true;
+                return;
+            }
+
+            if (e.Code == "Equal")
+            {
+                shift = true;
+                return;
+            }
+
+            var action = keyHandlers.FirstOrDefault(x => x.Codes.Contains(e.Code));
+            if (action != null && !pressedHandlers.Any(x => x == action))
+            {
+                if (MakeAction(action, true))
+                {
+                    timeTillActionRepeat = 1000;
+                }
+
+                pressedHandlers.Add(action);
+            }
         }
 
         private void OnKeyUp(KeyboardEvent e)
         {
-            Console.WriteLine(e.Code);
+            if (e.Code == "Escape")
+            {
+                // TODO escape
+                return;
+            }
+
+            if (e.Code == "Digit0")
+            {
+                ctrl = false;
+                return;
+            }
+
+            if (e.Code == "Minus")
+            {
+                alt = false;
+                return;
+            }
+
+            if (e.Code == "Equal")
+            {
+                shift = false;
+                return;
+            }
+
+            var action = keyHandlers.FirstOrDefault(x => x.Codes.Contains(e.Code));
+            if (action != null)
+            {
+                var handler = pressedHandlers.FirstOrDefault(x => x == action);
+                if (handler != null)
+                {
+                    pressedHandlers.Remove(handler);
+                    MakeAction(handler, false);
+                }
+            }
         }
 
         private async Task SetupAspectRatio()
@@ -219,6 +373,29 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
+        private void HandleUpdates(long time)
+        {
+            if (timeTillActionRepeat > 0)
+            {
+                timeTillActionRepeat -= time;
+            }
+            else if (pressedHandlers != null)
+            {
+                var done = false;
+                var position = pressedHandlers.Count;
+                while (!done && position > 0)
+                {
+                    position--;
+                    done = MakeAction(pressedHandlers[position], true);
+                }
+
+                if (done)
+                {
+                    timeTillActionRepeat = 500;
+                }
+            }
+        }
+
         private void Redraw()
         {
             var time = updatingStopwatch.ElapsedMilliseconds;
@@ -227,6 +404,8 @@ namespace LatronArs.WebClient.Pages.Scene
             {
                 return;
             }
+
+            HandleUpdates(time);
 
             var scene = GameService.CurrentScene;
 

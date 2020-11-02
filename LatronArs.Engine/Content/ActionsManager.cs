@@ -20,13 +20,7 @@ namespace LatronArs.Engine.Content
             // TODO
         }
 
-        public static int SwitchLight(Tile target, Actor issuer)
-        {
-            // TODO
-            return 0;
-        }
-
-        public static int SwitchLight(Actor target, Actor issuer)
+        public static int SwitchLight(ILightBox target, Actor issuer)
         {
             // TODO
             return 0;

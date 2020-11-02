@@ -8,7 +8,7 @@ using LatronArs.Models.Enums;
 
 namespace LatronArs.Engine.Scene.Objects
 {
-    public class Actor : ITreasureBox
+    public class Actor : ITreasureBox, ILightBox
     {
         public Tile Parent { get; set; }
 

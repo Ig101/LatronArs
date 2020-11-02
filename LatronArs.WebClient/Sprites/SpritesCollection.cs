@@ -18,7 +18,7 @@ namespace LatronArs.WebClient.Sprites
                 },
                 new SpriteVariation
                 {
-                    Direction = Direction.Top,
+                    Direction = Direction.Bottom,
                     Path = "sprites/thiefBottom",
                     Mask = true
                 },
@@ -44,7 +44,7 @@ namespace LatronArs.WebClient.Sprites
                 },
                 new SpriteVariation
                 {
-                    Direction = Direction.Top,
+                    Direction = Direction.Bottom,
                     Path = "sprites/guardianBottom",
                     Mask = true
                 },

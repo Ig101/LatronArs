@@ -103,10 +103,20 @@ namespace LatronArs.WebClient.Services
         {
             var variationsList = _spritesList[definition.Name];
             var neededVariation = variationsList
-                .First(x =>
+                .FirstOrDefault(x =>
                     (x.Direction == null || definition.Direction == x.Direction || (definition.Direction == Direction.Left && x.Mirrored)) &&
                     (x.State == null || definition.State == x.State));
-            return (position: new Point { X = neededVariation.X, Y = neededVariation.Y }, mirrored: definition.Direction == Direction.Left && neededVariation.Mirrored);
+            if (neededVariation != null)
+            {
+                return (position: new Point { X = neededVariation.X, Y = neededVariation.Y }, mirrored: definition.Direction == Direction.Left && neededVariation.Mirrored);
+            }
+            else
+            {
+                return GetSpritePositionByDefinition(new SpriteDefinition
+                {
+                    Name = "empty"
+                });
+            }
         }
 
         public async Task BuildSpriteTexturesAsync(ElementReference canvas)

@@ -7,7 +7,7 @@ using LatronArs.Models.Enums;
 
 namespace LatronArs.Engine.Scene.Objects
 {
-    public class Tile : ITreasureBox
+    public class Tile : ITreasureBox, ILightBox
     {
         public int X { get; set; }
 
