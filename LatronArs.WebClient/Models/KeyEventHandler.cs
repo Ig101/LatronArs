@@ -10,6 +10,8 @@ namespace LatronArs.WebClient.Models
 
         public Direction? Direction { get; set; }
 
+        public bool Space { get; set; }
+
         public bool Hold { get; set; }
 
         public Action<T> Action { get; set; }

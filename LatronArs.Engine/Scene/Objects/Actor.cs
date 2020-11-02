@@ -73,7 +73,7 @@ namespace LatronArs.Engine.Scene.Objects
             Color = Info.Color
         };
 
-        public bool HasItems => CurrentTile.Parent.Player != this && (Treasures.Any(x => x.Shines) || CurrentTile.Treasures.Any(x => x.Shines));
+        public bool HasItems => CurrentTile.Parent.Player != this && Treasures.Any(x => x.Shines);
 
         public Actor(
             Tile parent,

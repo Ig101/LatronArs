@@ -27,7 +27,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private const int TileOffset = 8;
         private const int InputDelay = 200;
         private const int WaitDelay = 100;
-        private const int CaptionSymbolsCount = 29;
+        private const int CaptionSymbolsCount = 31;
 
         [Inject]
         private IGameService GameService { get; set; }
@@ -51,6 +51,8 @@ namespace LatronArs.WebClient.Pages.Scene
         protected int CanvasHeight { get; set; }
 
         protected PickupModalData PickupModal { get; set; }
+
+        protected int PlayerValue { get; set; }
 
         private double zoom;
         private Stopwatch updatingStopwatch;
@@ -153,6 +155,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     new KeyEventHandler<SceneComponent>
                     {
                         Codes = new[] { "Space" },
+                        Space = true,
                         Action = SceneActions.PickupCenter,
                         ShiftAction = SceneActions.PickupCenter,
                         CtrlAction = SceneActions.PickupCenter,
@@ -164,8 +167,6 @@ namespace LatronArs.WebClient.Pages.Scene
 
         private void UnexpectedRedraw()
         {
-            StateHasChanged();
-
             if (GameService.CurrentScene != null)
             {
                 GameService.CurrentScene.Changed = true;
@@ -176,7 +177,7 @@ namespace LatronArs.WebClient.Pages.Scene
 
         private bool MakeAction(KeyEventHandler<SceneComponent> handler, bool hold)
         {
-            if (PickupModal != null && hold)
+            if (PickupModal != null)
             {
                 return true;
             }
@@ -252,11 +253,19 @@ namespace LatronArs.WebClient.Pages.Scene
             if (item != null)
             {
                 GameService.CurrentScene.Pickup(PickupModal.X, PickupModal.Y, item.Value.target, item.Value.treasure);
+                var items = GameService.CurrentScene.GetPickupItems(PickupModal.X, PickupModal.Y);
+                var actorItems = items.Where(x => x.target != null).ToList();
+                PickupModal.ActorName = actorItems.Count > 0 ? MakeCaptionFromActorName(actorItems[0].target.Name) : null;
+                PickupModal.ActorTreasures = items.Where(x => x.target != null).ToList();
+                PickupModal.FloorTreasures = items.Where(x => x.target == null).ToList();
             }
 
-            PickupModal = null;
-            InterfaceShift = 0;
-            UnexpectedRedraw();
+            if (item == null || (!PickupModal.FloorTreasures.Any() && !PickupModal.ActorTreasures.Any()))
+            {
+                PickupModal = null;
+                InterfaceShift = 0;
+                UnexpectedRedraw();
+            }
         }
 
         private void OnKeyDown(KeyboardEvent e)
@@ -491,6 +500,11 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
+        private void StateUpdates()
+        {
+            PlayerValue = GameService.CurrentScene.Player.Treasures.Sum(x => x.Amount * x.Value);
+        }
+
         private void Redraw()
         {
             var time = updatingStopwatch.ElapsedMilliseconds;
@@ -530,6 +544,8 @@ namespace LatronArs.WebClient.Pages.Scene
 
             if (scene.Changed && scene.Player != null)
             {
+                StateUpdates();
+                StateHasChanged();
                 textureMapping = new float[width * height * 12];
                 colors = new byte[width * height * 4];
                 masks = new byte[width * height * 4];

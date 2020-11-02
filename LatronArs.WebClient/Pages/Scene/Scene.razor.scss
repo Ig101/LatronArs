@@ -25,30 +25,48 @@
   left: 0px;
   top: 0px;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   height: 100vh;
   .pickup {
-    width: 30vw;
+    width: 29vw;
     padding: 1vw;
-    margin: 6px;
+    margin: 1vw;
     display: flex;
     flex-direction: column;
+    max-height: 98vh;
+    overflow: auto;
   }
   .controls {
 
   }
 }
+.side-info {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  padding: 0.5vw 2vw;
+  box-sizing: border-box;
+  display: flex;
+  span {
+    font-size: 1.8vw;
+  }
+}
 .caption {
-  font-size: 1.4vw;
+  font-size: 1.2vw;
   padding-top: 1vw;
   padding-bottom: 0.5vw;
   align-self: center;
 }
 .item {
-  font-size: 1.3vw;
+  font-size: 1vw;
   padding: 0.5vw 2vw;
 }
 .back {
-  font-size: 1.4vw;
+  font-size: 1.2vw;
   align-self: center;
-  padding-bottom: 1vw;
+  padding: 0.5vw 0;
+  margin-bottom: 0.5vw;
+  margin-top: 5vw;
 }

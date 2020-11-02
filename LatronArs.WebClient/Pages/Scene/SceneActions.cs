@@ -18,7 +18,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 if (scene != null)
                 {
                     var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1];
-                    if (tile.Actor != null)
+                    if (tile.Actor != null && scene.Player.Memories[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1]?.Sprite != null)
                     {
                         PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
@@ -34,7 +34,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 if (scene != null)
                 {
                     var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1];
-                    if (tile.Actor != null)
+                    if (tile.Actor != null && scene.Player.Memories[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1]?.Sprite != null)
                     {
                         PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
@@ -50,7 +50,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 if (scene != null)
                 {
                     var tile = scene.Tiles[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y];
-                    if (tile.Actor != null)
+                    if (tile.Actor != null && scene.Player.Memories[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y]?.Sprite != null)
                     {
                         PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
@@ -66,7 +66,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 if (scene != null)
                 {
                     var tile = scene.Tiles[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y];
-                    if (tile.Actor != null)
+                    if (tile.Actor != null && scene.Player.Memories[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y]?.Sprite != null)
                     {
                         PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
@@ -153,7 +153,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.CurrentTile.X + 1, scene.Player.CurrentTile.Y);
+                    scene.Interact(scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -198,6 +198,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
+                    PickupTile(sceneComponent, scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y);
                 }
             }
         }

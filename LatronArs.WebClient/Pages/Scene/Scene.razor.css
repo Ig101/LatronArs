@@ -39,13 +39,20 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   height: 100vh;
 }
 
 .interface .pickup {
-  width: 30vw;
+  width: 29vw;
   padding: 1vw;
-  margin: 6px;
+  margin: 1vw;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -53,10 +60,29 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  max-height: 98vh;
+  overflow: auto;
+}
+
+.side-info {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  padding: 0.5vw 2vw;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.side-info span {
+  font-size: 1.8vw;
 }
 
 .caption {
-  font-size: 1.4vw;
+  font-size: 1.2vw;
   padding-top: 1vw;
   padding-bottom: 0.5vw;
   -ms-flex-item-align: center;
@@ -65,15 +91,17 @@
 }
 
 .item {
-  font-size: 1.3vw;
+  font-size: 1vw;
   padding: 0.5vw 2vw;
 }
 
 .back {
-  font-size: 1.4vw;
+  font-size: 1.2vw;
   -ms-flex-item-align: center;
       -ms-grid-row-align: center;
       align-self: center;
-  padding-bottom: 1vw;
+  padding: 0.5vw 0;
+  margin-bottom: 0.5vw;
+  margin-top: 5vw;
 }
 /*# sourceMappingURL=Scene.razor.css.map */

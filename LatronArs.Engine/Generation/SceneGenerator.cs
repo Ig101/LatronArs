@@ -29,6 +29,27 @@ namespace LatronArs.Engine.Generation
                 contentManager.GetActorInfo("counter"),
                 treasures: new[]
                 {
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
+                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
                     new Treasure(contentManager.GetTreasureInfo("coin"), 120)
                 });
             _ = new Actor(
