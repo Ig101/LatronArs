@@ -89,7 +89,6 @@ namespace LatronArs.WebClient.Services
 
             await Task.WhenAll(tasks);
             TexturesLoaded = true;
-            Console.WriteLine($"texturesLoadingTime {sw.ElapsedMilliseconds}");
             sw.Stop();
             foreach (var task in _buildTasks)
             {

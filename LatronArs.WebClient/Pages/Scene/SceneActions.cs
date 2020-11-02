@@ -7,8 +7,9 @@ namespace LatronArs.WebClient.Pages.Scene
     {
         public static class SceneActions
         {
-            private static void PickupTile(SceneComponent sceneComponent, Tile tile)
+            private static void PickupTile(SceneComponent sceneComponent, int x, int y)
             {
+                sceneComponent.OpenPickupWindow(x, y);
             }
 
             public static void MoveUp(SceneComponent sceneComponent)
@@ -19,7 +20,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1];
                     if (tile.Actor != null)
                     {
-                        PickupTile(sceneComponent, tile);
+                        PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
                     }
 
@@ -35,7 +36,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1];
                     if (tile.Actor != null)
                     {
-                        PickupTile(sceneComponent, tile);
+                        PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
                     }
 
@@ -51,7 +52,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     var tile = scene.Tiles[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y];
                     if (tile.Actor != null)
                     {
-                        PickupTile(sceneComponent, tile);
+                        PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
                     }
 
@@ -67,7 +68,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     var tile = scene.Tiles[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y];
                     if (tile.Actor != null)
                     {
-                        PickupTile(sceneComponent, tile);
+                        PickupTile(sceneComponent, tile.X, tile.Y);
                         return;
                     }
 
@@ -161,7 +162,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1]);
+                    PickupTile(sceneComponent, scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y - 1);
                 }
             }
 
@@ -170,7 +171,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1]);
+                    PickupTile(sceneComponent, scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y + 1);
                 }
             }
 
@@ -179,7 +180,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y]);
+                    PickupTile(sceneComponent, scene.Player.CurrentTile.X - 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -188,7 +189,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y]);
+                    PickupTile(sceneComponent, scene.Player.CurrentTile.X + 1, scene.Player.CurrentTile.Y);
                 }
             }
 

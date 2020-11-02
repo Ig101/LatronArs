@@ -20,3 +20,35 @@
     }
   }
 }
+.interface {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  display: flex;
+  height: 100vh;
+  .pickup {
+    width: 30vw;
+    padding: 1vw;
+    margin: 6px;
+    display: flex;
+    flex-direction: column;
+  }
+  .controls {
+
+  }
+}
+.caption {
+  font-size: 1.4vw;
+  padding-top: 1vw;
+  padding-bottom: 0.5vw;
+  align-self: center;
+}
+.item {
+  font-size: 1.3vw;
+  padding: 0.5vw 2vw;
+}
+.back {
+  font-size: 1.4vw;
+  align-self: center;
+  padding-bottom: 1vw;
+}

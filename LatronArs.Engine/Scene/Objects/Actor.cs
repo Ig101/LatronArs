@@ -73,7 +73,7 @@ namespace LatronArs.Engine.Scene.Objects
             Color = Info.Color
         };
 
-        public bool HasItems => Treasures.Any(x => x.Shines) || CurrentTile.Treasures.Any(x => x.Shines);
+        public bool HasItems => CurrentTile.Parent.Player != this && (Treasures.Any(x => x.Shines) || CurrentTile.Treasures.Any(x => x.Shines));
 
         public Actor(
             Tile parent,
@@ -148,7 +148,7 @@ namespace LatronArs.Engine.Scene.Objects
                                 LightLevel = 1,
                                 Team = tile.Actor?.Team ?? 0,
                                 Visible = true,
-                                HasItems = (tile.Actor?.HasItems ?? false) || (tile.Treasures.Count > 0)
+                                HasItems = tile.Actor != null ? tile.Actor.HasItems : tile.HasItems
                             };
                         }
                         else if (Memories[x][y] != null)

@@ -4,4 +4,35 @@ body {
     background: #000;
     font: 16px PT Mono;
     font-weight: normal;
+    color: white;
+}
+
+::-webkit-scrollbar {
+    width: 8px
+}
+   
+::-webkit-scrollbar-thumb {
+background-color: white;
+}
+
+.modal {
+    border: double 4px #fff;
+    background: #000414;
+    box-sizing: border-box;
+    padding: 4px;
+}
+
+.filler {
+    flex: 1;
+}
+
+button {
+    cursor: pointer;
+    outline: none;
+    border: none;
+    font: inherit;
+    background: inherit;
+    color: white;
+    text-align: left;
+    display: flex;
 }

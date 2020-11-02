@@ -10,11 +10,11 @@ namespace LatronArs.Engine.Content
             int time = 0;
             if (target.Actor != null)
             {
-                time = target.Actor.InteractionReaction(target.Actor, issuer);
+                time = target.Actor.InteractionReaction?.Invoke(target.Actor, issuer) ?? 0;
             }
             else
             {
-                time = target.InteractionReaction(target, issuer);
+                time = target.InteractionReaction?.Invoke(target, issuer) ?? 0;
             }
 
             issuer.ActionDebt += time;

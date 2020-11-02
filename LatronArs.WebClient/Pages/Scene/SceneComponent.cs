@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LatronArs.Engine.Scene.Objects;
 using LatronArs.Models.Enums;
 using LatronArs.WebClient.Helpers;
 using LatronArs.WebClient.Models;
@@ -25,6 +27,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private const int TileOffset = 8;
         private const int InputDelay = 200;
         private const int WaitDelay = 100;
+        private const int CaptionSymbolsCount = 29;
 
         [Inject]
         private IGameService GameService { get; set; }
@@ -46,6 +49,8 @@ namespace LatronArs.WebClient.Pages.Scene
         protected int CanvasWidth { get; set; }
 
         protected int CanvasHeight { get; set; }
+
+        protected PickupModalData PickupModal { get; set; }
 
         private double zoom;
         private Stopwatch updatingStopwatch;
@@ -73,9 +78,12 @@ namespace LatronArs.WebClient.Pages.Scene
 
         private int InterfaceShift { get; set; }
 
+        private bool ModalOpened => PickupModal != null;
+
+        private int PickupModalShift => (int)((canvasSize?.Width ?? CanvasWidth) * 0.3);
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Console.WriteLine(firstRender);
             if (firstRender)
             {
                 EventsService.OnResize += SetupAspectRatio;
@@ -101,6 +109,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     new KeyEventHandler<SceneComponent>
                     {
                         Codes = new[] { "KeyW", "ArrowUp" },
+                        Direction = Direction.Top,
                         Action = SceneActions.MoveUp,
                         Hold = true,
                         ShiftAction = SceneActions.SprintUp,
@@ -111,6 +120,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     new KeyEventHandler<SceneComponent>
                     {
                         Codes = new[] { "KeyS", "ArrowDown" },
+                        Direction = Direction.Bottom,
                         Action = SceneActions.MoveDown,
                         Hold = true,
                         ShiftAction = SceneActions.SprintDown,
@@ -121,6 +131,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     new KeyEventHandler<SceneComponent>
                     {
                         Codes = new[] { "KeyA", "ArrowLeft" },
+                        Direction = Direction.Left,
                         Action = SceneActions.MoveLeft,
                         Hold = true,
                         ShiftAction = SceneActions.SprintLeft,
@@ -131,6 +142,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     new KeyEventHandler<SceneComponent>
                     {
                         Codes = new[] { "KeyD", "ArrowRight" },
+                        Direction = Direction.Right,
                         Action = SceneActions.MoveRight,
                         Hold = true,
                         ShiftAction = SceneActions.SprintRight,
@@ -150,8 +162,25 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
+        private void UnexpectedRedraw()
+        {
+            StateHasChanged();
+
+            if (GameService.CurrentScene != null)
+            {
+                GameService.CurrentScene.Changed = true;
+            }
+
+            Redraw();
+        }
+
         private bool MakeAction(KeyEventHandler<SceneComponent> handler, bool hold)
         {
+            if (PickupModal != null && hold)
+            {
+                return true;
+            }
+
             if (ctrl && handler.CtrlAction != null && handler.CtrlHold == hold)
             {
                 handler.CtrlAction(this);
@@ -183,6 +212,53 @@ namespace LatronArs.WebClient.Pages.Scene
             return false;
         }
 
+        private static string MakeCaptionFromActorName(string name)
+        {
+            StringBuilder sb = new StringBuilder();
+            var symbols = (CaptionSymbolsCount - name.Length) / 2;
+            for (var i = 0; i < symbols; i++)
+            {
+                sb.Append('-');
+            }
+
+            sb.Append(name);
+            for (var i = 0; i < symbols; i++)
+            {
+                sb.Append('-');
+            }
+
+            return sb.ToString();
+        }
+
+        private void OpenPickupWindow(int x, int y)
+        {
+            var items = GameService.CurrentScene.GetPickupItems(x, y);
+            var actorItems = items.Where(x => x.target != null).ToList();
+            var pickupModalData = new PickupModalData
+            {
+                ActorName = actorItems.Count > 0 ? MakeCaptionFromActorName(actorItems[0].target.Name) : null,
+                ActorTreasures = actorItems,
+                FloorTreasures = items.Where(x => x.target == null).ToList(),
+                X = x,
+                Y = y
+            };
+            PickupModal = pickupModalData;
+            InterfaceShift = PickupModalShift;
+            UnexpectedRedraw();
+        }
+
+        protected void CollectTreasureOrReset((Actor target, Treasure treasure)? item)
+        {
+            if (item != null)
+            {
+                GameService.CurrentScene.Pickup(PickupModal.X, PickupModal.Y, item.Value.target, item.Value.treasure);
+            }
+
+            PickupModal = null;
+            InterfaceShift = 0;
+            UnexpectedRedraw();
+        }
+
         private void OnKeyDown(KeyboardEvent e)
         {
             if (e.Code == "Escape")
@@ -205,6 +281,11 @@ namespace LatronArs.WebClient.Pages.Scene
             if (e.Code == "Equal")
             {
                 shift = true;
+                return;
+            }
+
+            if (PickupModal != null)
+            {
                 return;
             }
 
@@ -274,18 +355,13 @@ namespace LatronArs.WebClient.Pages.Scene
             }
 
             zoom = canvasSize.Width / CanvasWidth;
-            StateHasChanged();
 
-            if (GameService.CurrentScene != null)
-            {
-                GameService.CurrentScene.Changed = true;
-            }
-
-            Redraw();
+            UnexpectedRedraw();
         }
 
         private void FillEmptyActor(
             int texturePosition,
+            bool silhouette = false,
             bool shines = false)
         {
             WebGLHelper.FillSprite(
@@ -298,7 +374,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     State = AIState.Neutral
                 },
                 texturePosition);
-            WebGLHelper.FillColor(colors, masks, 0, 0, 0, 0, shines, false, false, texturePosition);
+            WebGLHelper.FillColor(colors, masks, 0, 0, 0, 0, shines, silhouette, false, texturePosition);
         }
 
         private void FillEmptyTile(
@@ -347,7 +423,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 }
                 else
                 {
-                    FillEmptyActor(texturePosition, memory.HasItems);
+                    FillEmptyActor(texturePosition, !memory.Visible, memory.HasItems);
                 }
 
                 if (memory.Visible)
@@ -401,14 +477,17 @@ namespace LatronArs.WebClient.Pages.Scene
                 }
             }
 
-            if (waitTimer > 0)
+            if (!ModalOpened)
             {
-                waitTimer -= time;
-            }
-            else
-            {
-                GameService.CurrentScene.Wait();
-                waitTimer += WaitDelay;
+                if (waitTimer > 0)
+                {
+                    waitTimer -= time;
+                }
+                else
+                {
+                    GameService.CurrentScene.Wait();
+                    waitTimer += WaitDelay;
+                }
             }
         }
 
@@ -427,11 +506,19 @@ namespace LatronArs.WebClient.Pages.Scene
 
             if (scene.Changed && scene.Player != null)
             {
-                CameraX = scene.Player.CurrentTile.X + 0.5;
-                CameraY = scene.Player.CurrentTile.Y - 0.5;
+                if (PickupModal != null)
+                {
+                    CameraX = PickupModal.X + 0.5;
+                    CameraY = PickupModal.Y - 0.5;
+                }
+                else
+                {
+                    CameraX = scene.Player.CurrentTile.X + 0.5;
+                    CameraY = scene.Player.CurrentTile.Y - 0.5;
+                }
             }
 
-            var cameraLeft = CameraX - (canvasSize.Width / 2 / TileSize / zoom);
+            var cameraLeft = CameraX - ((canvasSize.Width + InterfaceShift) / 2 / TileSize / zoom);
             var cameraTop = CameraY - (canvasSize.Height / 2 / TileSize / zoom);
 
             var left = (int)(cameraLeft - 1);

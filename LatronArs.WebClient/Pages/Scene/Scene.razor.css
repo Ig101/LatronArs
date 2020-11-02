@@ -31,4 +31,49 @@
   height: 100%;
   background-color: transparent;
 }
+
+.interface {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100vh;
+}
+
+.interface .pickup {
+  width: 30vw;
+  padding: 1vw;
+  margin: 6px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.caption {
+  font-size: 1.4vw;
+  padding-top: 1vw;
+  padding-bottom: 0.5vw;
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+}
+
+.item {
+  font-size: 1.3vw;
+  padding: 0.5vw 2vw;
+}
+
+.back {
+  font-size: 1.4vw;
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+  padding-bottom: 1vw;
+}
 /*# sourceMappingURL=Scene.razor.css.map */

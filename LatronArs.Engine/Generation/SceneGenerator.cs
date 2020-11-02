@@ -15,7 +15,10 @@ namespace LatronArs.Engine.Generation
                 for (var y = 0; y < 50; y++)
                 {
                     tiles.Add(x == 32 && y == 20 ?
-                        new Tile(null, x, y, contentManager.GetFloorInfo("stone"), contentManager.GetCeilingInfo("chindalerie")) :
+                        new Tile(null, x, y, contentManager.GetFloorInfo("stone"), contentManager.GetCeilingInfo("chindalerie"), true, new[]
+                        {
+                            new Treasure(contentManager.GetTreasureInfo("coin"), 80)
+                        }) :
                         new Tile(null, x, y, contentManager.GetFloorInfo("floor")));
                 }
             }

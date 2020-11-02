@@ -3,3 +3,36 @@
 <div class="battle">
   <canvas id="1000" @ref="PictureCanvasRef" width="@CanvasWidth" height="@CanvasHeight"></canvas>  
 </div>
+<div class="interface">
+  @if (PickupModal != null)
+  {
+    <div class="modal pickup">
+      @if (PickupModal.ActorTreasures.Count() == 0 && PickupModal.FloorTreasures.Count() == 0)
+      {
+        <div class="caption">------------Empty------------</div>
+      }
+      @if (PickupModal.ActorTreasures.Count() > 0)
+      {
+        <div class="caption">@PickupModal.ActorName</div>
+      }
+      @foreach (var item in PickupModal.ActorTreasures)
+      {
+        <button class="item" @onclick="@(e => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
+      }
+      @if (PickupModal.FloorTreasures.Count() > 0)
+      {
+        <div class="caption">------------Floor------------</div>
+      }
+      @foreach (var item in PickupModal.FloorTreasures)
+      {
+        <button class="item" @onclick="@(e => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
+      }
+      <div class="filler"></div>
+      <button class="back" @onclick="@(e => CollectTreasureOrReset(null))">&lt; Back ></button>
+    </div>
+  }
+  else
+  {
+    <div class="controls"></div>
+  }
+</div>

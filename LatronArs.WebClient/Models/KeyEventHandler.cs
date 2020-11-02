@@ -1,11 +1,14 @@
 using System;
 using LatronArs.Engine.Scene;
+using LatronArs.Models.Enums;
 
 namespace LatronArs.WebClient.Models
 {
     public class KeyEventHandler<T>
     {
         public string[] Codes { get; set; }
+
+        public Direction? Direction { get; set; }
 
         public bool Hold { get; set; }
 

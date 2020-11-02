@@ -40,6 +40,8 @@ namespace LatronArs.Engine.Scene.Objects
 
         public Tile CurrentTile => this;
 
+        public bool HasItems => Treasures.Any(x => x.Shines);
+
         public Tile(
             Scene parent,
             int x,
