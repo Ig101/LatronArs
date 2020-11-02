@@ -23,6 +23,8 @@ namespace LatronArs.WebClient.Pages.Scene
         private const float DefaultAspectRatio = (float)DefaultWidth / DefaultHeight;
         private const int TileSize = 30;
         private const int TileOffset = 8;
+        private const int InputDelay = 200;
+        private const int WaitDelay = 100;
 
         [Inject]
         private IGameService GameService { get; set; }
@@ -63,6 +65,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private bool alt;
         private bool ctrl;
         private long timeTillActionRepeat = 0;
+        private long waitTimer = 2000;
 
         private double CameraX { get; set; }
 
@@ -152,24 +155,28 @@ namespace LatronArs.WebClient.Pages.Scene
             if (ctrl && handler.CtrlAction != null && handler.CtrlHold == hold)
             {
                 handler.CtrlAction(this);
+                waitTimer = WaitDelay;
                 return true;
             }
 
             if (alt && !ctrl && handler.AltAction != null && handler.AltHold == hold)
             {
                 handler.AltAction(this);
+                waitTimer = WaitDelay;
                 return true;
             }
 
             if (shift && !alt && !ctrl && handler.ShiftAction != null && handler.ShiftHold == hold)
             {
                 handler.ShiftAction(this);
+                waitTimer = WaitDelay;
                 return true;
             }
 
             if (!alt && !ctrl && !shift && handler.Action != null && handler.Hold == hold)
             {
                 handler.Action(this);
+                waitTimer = WaitDelay;
                 return true;
             }
 
@@ -206,7 +213,7 @@ namespace LatronArs.WebClient.Pages.Scene
             {
                 if (MakeAction(action, true))
                 {
-                    timeTillActionRepeat = 1000;
+                    timeTillActionRepeat = InputDelay * 2;
                 }
 
                 pressedHandlers.Add(action);
@@ -318,8 +325,7 @@ namespace LatronArs.WebClient.Pages.Scene
             var memory = GameService.CurrentScene.Player.Memories[x][y];
             if (memory != null)
             {
-                var memoryVal = memory.Value;
-                var sprite = memoryVal.Sprite;
+                var sprite = memory.Sprite;
                 if (sprite != null)
                 {
                     WebGLHelper.FillSprite(
@@ -334,17 +340,17 @@ namespace LatronArs.WebClient.Pages.Scene
                         sprite.Color.G,
                         sprite.Color.B,
                         255,
-                        memoryVal.HasItems,
-                        !memoryVal.Visible,
+                        memory.HasItems,
+                        !memory.Visible,
                         false,
                         texturePosition);
                 }
                 else
                 {
-                    FillEmptyActor(texturePosition, memoryVal.HasItems);
+                    FillEmptyActor(texturePosition, memory.HasItems);
                 }
 
-                if (memoryVal.Visible)
+                if (memory.Visible)
                 {
                     var tile = GameService.CurrentScene.Tiles[x][y];
                     var light = GameService.CurrentScene.LightMap[x][y];
@@ -391,8 +397,18 @@ namespace LatronArs.WebClient.Pages.Scene
 
                 if (done)
                 {
-                    timeTillActionRepeat = 500;
+                    timeTillActionRepeat += InputDelay;
                 }
+            }
+
+            if (waitTimer > 0)
+            {
+                waitTimer -= time;
+            }
+            else
+            {
+                GameService.CurrentScene.Wait();
+                waitTimer += WaitDelay;
             }
         }
 
@@ -411,8 +427,8 @@ namespace LatronArs.WebClient.Pages.Scene
 
             if (scene.Changed && scene.Player != null)
             {
-                CameraX = scene.Player.Parent.X + 0.5;
-                CameraY = scene.Player.Parent.Y - 0.5;
+                CameraX = scene.Player.CurrentTile.X + 0.5;
+                CameraY = scene.Player.CurrentTile.Y - 0.5;
             }
 
             var cameraLeft = CameraX - (canvasSize.Width / 2 / TileSize / zoom);

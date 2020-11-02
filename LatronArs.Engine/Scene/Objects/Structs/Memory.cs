@@ -2,7 +2,7 @@ using LatronArs.Engine.Scene.Components;
 
 namespace LatronArs.Engine.Scene.Objects.Structs
 {
-    public struct Memory
+    public class Memory
     {
         public SpriteDefinition Sprite { get; set; }
 

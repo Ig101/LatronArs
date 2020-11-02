@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LatronArs.Engine.AI;
+using LatronArs.Engine.Helpers;
 using LatronArs.Engine.Scene.Components;
 using LatronArs.Engine.Scene.Objects.Structs;
 using LatronArs.Models.Enums;
@@ -10,7 +11,7 @@ namespace LatronArs.Engine.Scene.Objects
 {
     public class Actor : ITreasureBox, ILightBox
     {
-        public Tile Parent { get; set; }
+        public Tile CurrentTile { get; set; }
 
         public ActorInfo Info { get; set; }
 
@@ -58,7 +59,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public double NoiseTransmission => Info.NoiseTransmission;
 
-        public Memory?[][] Memories => AI?.Memories;
+        public Memory[][] Memories => AI?.Memories;
 
         public AIState AIState => AI?.State ?? AIState.Neutral;
 
@@ -72,7 +73,7 @@ namespace LatronArs.Engine.Scene.Objects
             Color = Info.Color
         };
 
-        public bool HasItems => Treasures.Any(x => x.Shines) || Parent.Treasures.Any(x => x.Shines);
+        public bool HasItems => Treasures.Any(x => x.Shines) || CurrentTile.Treasures.Any(x => x.Shines);
 
         public Actor(
             Tile parent,
@@ -88,7 +89,7 @@ namespace LatronArs.Engine.Scene.Objects
             AI = ai;
             ActionDebt = debt;
             Team = team;
-            Parent = parent;
+            CurrentTile = parent;
             LightOn = lightOn;
             if (ai != null)
             {
@@ -111,9 +112,9 @@ namespace LatronArs.Engine.Scene.Objects
             }
         }
 
-        private void IssueNoise(Tile tile, double power, string phrase)
+        public void IssueNoise(Tile tile, double power, string phrase)
         {
-            Parent.Parent.IssueNoise(tile.X, tile.Y, power, this, phrase);
+            CurrentTile.Parent.IssueNoise(tile.X, tile.Y, power, this, phrase);
         }
 
         private void AddActorToMemory(int x, int y, Actor actor)
@@ -134,19 +135,26 @@ namespace LatronArs.Engine.Scene.Objects
             {
                 // TODO UpdateVisionRight
                 // TODO Add memory calculating
-                for (var x = Math.Max(0, Parent.X - 7); x < Math.Min(Memories.Length, Parent.X + 8); x++)
+                for (var x = 0; x < Memories.Length; x++)
                 {
-                    for (var y = Math.Max(0, Parent.Y - 7); y < Math.Min(Memories[x].Length, Parent.Y + 8); y++)
+                    for (var y = 0; y < Memories[x].Length; y++)
                     {
-                        var tile = Parent.Parent.Tiles[x][y];
-                        Memories[x][y] = new Memory
+                        if (MathHelper.RangeBetween(x, y, CurrentTile.X, CurrentTile.Y) <= 7.6)
                         {
-                            Sprite = tile.Actor?.Sprite,
-                            LightLevel = 1,
-                            Team = tile.Actor?.Team ?? 0,
-                            Visible = true,
-                            HasItems = (tile.Actor?.HasItems ?? false) || (tile.Treasures.Count > 0)
-                        };
+                            var tile = CurrentTile.Parent.Tiles[x][y];
+                            Memories[x][y] = new Memory
+                            {
+                                Sprite = tile.Actor?.Sprite,
+                                LightLevel = 1,
+                                Team = tile.Actor?.Team ?? 0,
+                                Visible = true,
+                                HasItems = (tile.Actor?.HasItems ?? false) || (tile.Treasures.Count > 0)
+                            };
+                        }
+                        else if (Memories[x][y] != null)
+                        {
+                            Memories[x][y].Visible = false;
+                        }
                     }
                 }
             }
@@ -154,21 +162,21 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void ChangeDirection(int x, int y)
         {
-            Direction = x > Parent.X ?
-                Direction.Right : x < Parent.X ?
-                Direction.Left : y > Parent.Y ?
-                Direction.Bottom : y < Parent.Y ?
+            Direction = x > CurrentTile.X ?
+                Direction.Right : x < CurrentTile.X ?
+                Direction.Left : y > CurrentTile.Y ?
+                Direction.Bottom : y < CurrentTile.Y ?
                 Direction.Top : Direction;
         }
 
         public void IssueNoise(double power, string phrase)
         {
-            IssueNoise(Parent, power, phrase);
+            IssueNoise(CurrentTile, power, phrase);
         }
 
         public void Interact(Tile tile)
         {
-            Parent.Parent.Changed = true;
+            CurrentTile.Parent.Changed = true;
             if (InteractAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -178,7 +186,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Move(Tile tile)
         {
-            Parent.Parent.Changed = true;
+            CurrentTile.Parent.Changed = true;
             if (MoveAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -197,7 +205,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Sprint(Tile tile)
         {
-            Parent.Parent.Changed = true;
+            CurrentTile.Parent.Changed = true;
             if (SprintAction != null && tile.Actor == null)
             {
                 ChangeDirection(tile.X, tile.Y);
@@ -216,7 +224,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Pickup(Tile tile, Actor target, Treasure treasure)
         {
-            Parent.Parent.Changed = true;
+            CurrentTile.Parent.Changed = true;
             ChangeDirection(tile.X, tile.Y);
             var noiseModifier = target?.PickupFromNoiseModifier ?? 1;
             var timeModifier = target?.PickupFromTimeCostModifier ?? 1;
@@ -228,7 +236,18 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Wait()
         {
-            ActionDebt += 100;
+            ActionDebt += 5;
+        }
+
+        public (double noise, double time) SwitchLight()
+        {
+            if (Light == null)
+            {
+                return (0, 0);
+            }
+
+            LightOn = !LightOn;
+            return (PickupFromNoiseModifier * Scene.LightNoise, Light.TurnOffCostModifier);
         }
     }
 }

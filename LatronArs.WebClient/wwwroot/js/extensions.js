@@ -12,19 +12,25 @@ eventsExtensions = {
         DotNet.invokeMethodAsync('LatronArs.WebClient', 'PushResize').then(data => data);
     },
     keyDowned: function (e) {
-        e.preventDefault();
-        DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyDown', {
-            code: e.code,
-            altKey: e.altKey,
-            ctrlKey: e.ctrlKey,
-            shiftKey: e.shiftKey
-        });
+        if (e.code[0] !== 'F')
+        {
+            e.preventDefault();
+            DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyDown', {
+                code: e.code,
+                altKey: e.altKey,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey
+            });
+        }
     },
     keyUpped: function (e) {
-        e.preventDefault();
-        DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyUp', {
-            code: e.code
-        });
+        if (e.code[0] !== 'F')
+        {
+            e.preventDefault();
+            DotNet.invokeMethod('LatronArs.WebClient', 'PushKeyUp', {
+                code: e.code
+            });
+        }
     },
     cancelAction: function (e) {
         e.preventDefault();

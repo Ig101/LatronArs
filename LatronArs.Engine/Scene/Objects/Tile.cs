@@ -38,6 +38,8 @@ namespace LatronArs.Engine.Scene.Objects
 
         public double NoiseMultiplier => Floor.NoiseMultiplier;
 
+        public Tile CurrentTile => this;
+
         public Tile(
             Scene parent,
             int x,
@@ -54,6 +56,17 @@ namespace LatronArs.Engine.Scene.Objects
             Ceiling = ceiling;
             Treasures = treasures?.ToList() ?? new List<Treasure>();
             LightOn = lightOn;
+        }
+
+        public (double noise, double time) SwitchLight()
+        {
+            if (Light == null)
+            {
+                return (0, 0);
+            }
+
+            LightOn = !LightOn;
+            return (Scene.LightNoise, Light.TurnOffCostModifier);
         }
     }
 }

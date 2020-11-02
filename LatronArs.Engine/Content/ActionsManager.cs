@@ -7,7 +7,17 @@ namespace LatronArs.Engine.Content
     {
         public static void PlayerInteraction(Tile target, Actor issuer)
         {
-            // TODO
+            int time = 0;
+            if (target.Actor != null)
+            {
+                time = target.Actor.InteractionReaction(target.Actor, issuer);
+            }
+            else
+            {
+                time = target.InteractionReaction(target, issuer);
+            }
+
+            issuer.ActionDebt += time;
         }
 
         public static void GuardianInteraction(Tile target, Actor issuer)
@@ -17,13 +27,20 @@ namespace LatronArs.Engine.Content
 
         public static void SimpleMove(Tile target, Actor issuer, ActionInfo action)
         {
-            // TODO
+            issuer.CurrentTile.Actor = null;
+            issuer.CurrentTile = target;
+            target.Actor = issuer;
         }
 
         public static int SwitchLight(ILightBox target, Actor issuer)
         {
-            // TODO
-            return 0;
+            var (noise, time) = target.SwitchLight();
+            if (noise > 0)
+            {
+                issuer.IssueNoise(target.CurrentTile, noise, null);
+            }
+
+            return (int)(time * issuer.PickupTimeCost);
         }
     }
 }

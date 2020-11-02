@@ -11,6 +11,7 @@ namespace LatronArs.Engine.Scene
     {
         public const int ActionPointsPerSecond = 10;
         public const int HoursForPlay = 4;
+        public const double LightNoise = 0.1;
 
         public event Action<SceneResult> SceneFinished;
 
@@ -93,7 +94,7 @@ namespace LatronArs.Engine.Scene
             }
         }
 
-        private void AfterActionUpdate()
+        private void AfterActionUpdate(bool meaningful = true)
         {
             // Actions phase
             var time = Player.ActionDebt;
@@ -104,21 +105,24 @@ namespace LatronArs.Engine.Scene
                 actor.ActionDebt -= time;
                 while (actor.ActionDebt <= 0)
                 {
-                    // TODOLP SomeActions
+                    // TODOLP SomeActions, set meaningful for more if any action done
                     actor.Wait();
                 }
             }
 
-            // Updates
-            UpdateLightMap();
-            Player.UpdateVisionAndMemories();
-
-            // ActorUpdates
-            foreach (var actor in IntelligentActors)
+            if (meaningful)
             {
-                actor.UpdateVisionAndMemories();
+            // Updates
+                UpdateLightMap();
+                Player.UpdateVisionAndMemories();
 
-                // TODOLP params update and reaction
+                // ActorUpdates
+                foreach (var actor in IntelligentActors)
+                {
+                    actor.UpdateVisionAndMemories();
+
+                    // TODOLP params update and reaction
+                }
             }
 
             // VictoryChecks
@@ -225,7 +229,7 @@ namespace LatronArs.Engine.Scene
         public void Wait()
         {
             Player.Wait();
-            AfterActionUpdate();
+            AfterActionUpdate(false);
         }
     }
 }

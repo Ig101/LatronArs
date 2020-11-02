@@ -1,4 +1,5 @@
 using System;
+using LatronArs.Engine.Scene.Objects;
 
 namespace LatronArs.WebClient.Pages.Scene
 {
@@ -6,12 +7,23 @@ namespace LatronArs.WebClient.Pages.Scene
     {
         public static class SceneActions
         {
+            private static void PickupTile(SceneComponent sceneComponent, Tile tile)
+            {
+            }
+
             public static void MoveUp(SceneComponent sceneComponent)
             {
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Move(scene.Player.Parent.X, scene.Player.Parent.Y - 1);
+                    var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1];
+                    if (tile.Actor != null)
+                    {
+                        PickupTile(sceneComponent, tile);
+                        return;
+                    }
+
+                    scene.Move(tile.X, tile.Y);
                 }
             }
 
@@ -20,7 +32,14 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Move(scene.Player.Parent.X, scene.Player.Parent.Y + 1);
+                    var tile = scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1];
+                    if (tile.Actor != null)
+                    {
+                        PickupTile(sceneComponent, tile);
+                        return;
+                    }
+
+                    scene.Move(tile.X, tile.Y);
                 }
             }
 
@@ -29,7 +48,14 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Move(scene.Player.Parent.X - 1, scene.Player.Parent.Y);
+                    var tile = scene.Tiles[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y];
+                    if (tile.Actor != null)
+                    {
+                        PickupTile(sceneComponent, tile);
+                        return;
+                    }
+
+                    scene.Move(tile.X, tile.Y);
                 }
             }
 
@@ -38,7 +64,14 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Move(scene.Player.Parent.X + 1, scene.Player.Parent.Y);
+                    var tile = scene.Tiles[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y];
+                    if (tile.Actor != null)
+                    {
+                        PickupTile(sceneComponent, tile);
+                        return;
+                    }
+
+                    scene.Move(tile.X, tile.Y);
                 }
             }
 
@@ -47,7 +80,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Sprint(scene.Player.Parent.X, scene.Player.Parent.Y - 1);
+                    scene.Sprint(scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y - 1);
                 }
             }
 
@@ -56,7 +89,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Sprint(scene.Player.Parent.X, scene.Player.Parent.Y + 1);
+                    scene.Sprint(scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y + 1);
                 }
             }
 
@@ -65,7 +98,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Sprint(scene.Player.Parent.X - 1, scene.Player.Parent.Y);
+                    scene.Sprint(scene.Player.CurrentTile.X - 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -74,7 +107,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Sprint(scene.Player.Parent.X + 1, scene.Player.Parent.Y);
+                    scene.Sprint(scene.Player.CurrentTile.X + 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -83,7 +116,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.Parent.X, scene.Player.Parent.Y - 1);
+                    scene.Interact(scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y - 1);
                 }
             }
 
@@ -92,7 +125,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.Parent.X, scene.Player.Parent.Y + 1);
+                    scene.Interact(scene.Player.CurrentTile.X, scene.Player.CurrentTile.Y + 1);
                 }
             }
 
@@ -101,7 +134,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.Parent.X - 1, scene.Player.Parent.Y);
+                    scene.Interact(scene.Player.CurrentTile.X - 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -110,7 +143,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.Parent.X + 1, scene.Player.Parent.Y);
+                    scene.Interact(scene.Player.CurrentTile.X + 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -119,7 +152,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    scene.Interact(scene.Player.Parent.X + 1, scene.Player.Parent.Y);
+                    scene.Interact(scene.Player.CurrentTile.X + 1, scene.Player.CurrentTile.Y);
                 }
             }
 
@@ -128,7 +161,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
-                    // TODO OpenModal
+                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y - 1]);
                 }
             }
 
@@ -137,6 +170,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
+                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X][scene.Player.CurrentTile.Y + 1]);
                 }
             }
 
@@ -145,6 +179,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
+                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X - 1][scene.Player.CurrentTile.Y]);
                 }
             }
 
@@ -153,6 +188,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 var scene = sceneComponent.GameService?.CurrentScene;
                 if (scene != null)
                 {
+                    PickupTile(sceneComponent, scene.Tiles[scene.Player.CurrentTile.X + 1][scene.Player.CurrentTile.Y]);
                 }
             }
 
