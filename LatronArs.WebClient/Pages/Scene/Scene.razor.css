@@ -64,7 +64,7 @@
   overflow: auto;
 }
 
-.side-info {
+.side-info-container {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -77,8 +77,48 @@
   display: flex;
 }
 
-.side-info span {
-  font-size: 1.8vw;
+.side-info-container .side-info {
+  padding: 0.5vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background: rgba(0, 4, 20, 0.5);
+  border-radius: 0.1vw;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.side-info-container .side-info .time {
+  margin-right: 2vw;
+}
+
+.side-info-container .side-info span {
+  font-size: 1vw;
+  line-height: 1.2vw;
+}
+
+.side-info-container .side-info button {
+  margin-left: 2vw;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.side-info-container .side-info button div {
+  background: white;
+  height: 0.24vw;
+  margin-top: 0.24vw;
+  width: 1.3vw;
+}
+
+.side-info-container .side-info button div:first-child {
+  margin-top: 0;
+}
+
+.side-info-container .side-info button .item-active {
+  background: #ff0;
 }
 
 .caption {
@@ -103,5 +143,9 @@
   padding: 0.5vw 0;
   margin-bottom: 0.5vw;
   margin-top: 5vw;
+}
+
+.button-active {
+  color: #ff0 !important;
 }
 /*# sourceMappingURL=Scene.razor.css.map */

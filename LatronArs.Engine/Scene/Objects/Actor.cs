@@ -198,6 +198,7 @@ namespace LatronArs.Engine.Scene.Objects
                 }
                 else
                 {
+                    ActionDebt += Scene.MoveCrushCost;
                     AddActorToMemory(tile.X, tile.Y, tile.Actor);
                 }
             }
@@ -206,7 +207,7 @@ namespace LatronArs.Engine.Scene.Objects
         public void Sprint(Tile tile)
         {
             CurrentTile.Parent.Changed = true;
-            if (SprintAction != null && tile.Actor == null)
+            if (SprintAction != null)
             {
                 ChangeDirection(tile.X, tile.Y);
                 if (tile.Actor == null)
@@ -217,6 +218,8 @@ namespace LatronArs.Engine.Scene.Objects
                 }
                 else
                 {
+                    IssueNoise(tile, SprintAction.NoiseModifier * 5, null);
+                    ActionDebt += Scene.SprintCrushCost;
                     AddActorToMemory(tile.X, tile.Y, tile.Actor);
                 }
             }
@@ -236,7 +239,7 @@ namespace LatronArs.Engine.Scene.Objects
 
         public void Wait()
         {
-            ActionDebt += 5;
+            ActionDebt += 50;
         }
 
         public (double noise, double time) SwitchLight()

@@ -3,9 +3,19 @@
 <div class="battle">
   <canvas id="1000" @ref="PictureCanvasRef" width="@CanvasWidth" height="@CanvasHeight"></canvas>  
 </div>
-<div class="side-info">
-  <span class="filler"></span>
-  <span>@PlayerValue</span>
+<div class="side-info-container">
+  <div class="filler"></div>
+  <div class="side-info">
+    <span class="time">@Time</span>
+    <span>@PlayerValue</span>
+    <span>/</span>
+    <span>@PlannedSpends</span>
+    <button @onclick="@(_ => OpenMainMenu())">
+      <div class="@(Escape ? "item-active":"")"></div>
+      <div class="@(Escape ? "item-active":"")"></div>
+      <div class="@(Escape ? "item-active":"")"></div>
+    </button>
+  </div>
 </div>
 <div class="interface">
   @if (PickupModal != null)
@@ -21,7 +31,7 @@
       }
       @foreach (var item in PickupModal.ActorTreasures)
       {
-        <button class="item" @onclick="@(e => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
+        <button class="@(item.treasure == PickupModal.CurrentSelection ? "button-active item":"item")" @onclick="@(_ => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
       }
       @if (PickupModal.FloorTreasures.Count() > 0)
       {
@@ -29,9 +39,9 @@
       }
       @foreach (var item in PickupModal.FloorTreasures)
       {
-        <button class="item" @onclick="@(e => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
+        <button class="@(item.treasure == PickupModal.CurrentSelection ? "button-active item":"item")" @onclick="@(_ => CollectTreasureOrReset(item))"><span>@item.treasure.Name</span><span class="filler"></span><span>@item.treasure.Amount</span></button>
       }
-      <button class="back" @onclick="@(e => CollectTreasureOrReset(null))">&lt; Back ></button>
+      <button class="@(null == PickupModal.CurrentSelection ? "button-active back":"back")" @onclick="@(_ => CollectTreasureOrReset(null))">&lt; Back ></button>
     </div>
   }
   else

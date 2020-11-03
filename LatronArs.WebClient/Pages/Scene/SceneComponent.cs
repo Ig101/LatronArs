@@ -26,7 +26,7 @@ namespace LatronArs.WebClient.Pages.Scene
         private const int TileSize = 30;
         private const int TileOffset = 8;
         private const int InputDelay = 200;
-        private const int WaitDelay = 100;
+        private const int WaitDelay = 1000;
         private const int CaptionSymbolsCount = 31;
 
         [Inject]
@@ -54,6 +54,18 @@ namespace LatronArs.WebClient.Pages.Scene
 
         protected int PlayerValue { get; set; }
 
+        protected int PlannedSpends => GameService.PlannedSpends;
+
+        protected string Time => GameService.CurrentScene?.GetCurrentTime();
+
+        protected bool Escape { get; private set; }
+
+        protected bool Shift { get; private set; }
+
+        protected bool Ctrl { get; private set; }
+
+        protected bool Alt { get; private set; }
+
         private double zoom;
         private Stopwatch updatingStopwatch;
         private Timer timer;
@@ -68,9 +80,6 @@ namespace LatronArs.WebClient.Pages.Scene
 
         private IEnumerable<KeyEventHandler<SceneComponent>> keyHandlers;
         private IList<KeyEventHandler<SceneComponent>> pressedHandlers;
-        private bool shift;
-        private bool alt;
-        private bool ctrl;
         private long timeTillActionRepeat = 0;
         private long waitTimer = 2000;
 
@@ -154,7 +163,7 @@ namespace LatronArs.WebClient.Pages.Scene
                     },
                     new KeyEventHandler<SceneComponent>
                     {
-                        Codes = new[] { "Space" },
+                        Codes = new[] { "Space", "Enter" },
                         Space = true,
                         Action = SceneActions.PickupCenter,
                         ShiftAction = SceneActions.PickupCenter,
@@ -179,31 +188,126 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             if (PickupModal != null)
             {
+                if (hold)
+                {
+                    var actorIndex = PickupModal.ActorTreasures.FindIndex(x => x.treasure == PickupModal.CurrentSelection);
+                    var tileIndex = PickupModal.FloorTreasures.FindIndex(x => x.treasure == PickupModal.CurrentSelection);
+
+                    switch (handler.Direction)
+                    {
+                        case Direction.Top:
+                            if (actorIndex >= 0)
+                            {
+                                actorIndex--;
+                                if (actorIndex < 0)
+                                {
+                                    PickupModal.CurrentSelection = null;
+                                    PickupModal.CurrentActor = null;
+                                }
+                                else
+                                {
+                                    var (target, treasure) = PickupModal.ActorTreasures[actorIndex];
+                                    PickupModal.CurrentSelection = treasure;
+                                    PickupModal.CurrentActor = target;
+                                }
+                            }
+                            else if (tileIndex >= 0)
+                            {
+                                tileIndex--;
+                                if (tileIndex < 0)
+                                {
+                                    var (target, treasure) = PickupModal.ActorTreasures.Count > 0 ? PickupModal.ActorTreasures[^1] : (null, null);
+                                    PickupModal.CurrentSelection = treasure;
+                                    PickupModal.CurrentActor = target;
+                                }
+                                else
+                                {
+                                    PickupModal.CurrentSelection = PickupModal.FloorTreasures[tileIndex].treasure;
+                                    PickupModal.CurrentActor = null;
+                                }
+                            }
+                            else
+                            {
+                                var (target, treasure) = PickupModal.FloorTreasures.Count > 0 ? PickupModal.FloorTreasures[^1] : PickupModal.ActorTreasures.Count > 0 ? PickupModal.ActorTreasures[^1] : (null, null);
+                                PickupModal.CurrentSelection = treasure;
+                                PickupModal.CurrentActor = target;
+                            }
+
+                            break;
+                        case Direction.Bottom:
+                            if (actorIndex >= 0)
+                            {
+                                actorIndex++;
+                                if (actorIndex >= PickupModal.ActorTreasures.Count)
+                                {
+                                    PickupModal.CurrentSelection = PickupModal.FloorTreasures.Count > 0 ? PickupModal.FloorTreasures[0].treasure : null;
+                                    PickupModal.CurrentActor = null;
+                                }
+                                else
+                                {
+                                    var (target, treasure) = PickupModal.ActorTreasures[actorIndex];
+                                    PickupModal.CurrentSelection = treasure;
+                                    PickupModal.CurrentActor = target;
+                                }
+                            }
+                            else if (tileIndex >= 0)
+                            {
+                                tileIndex++;
+                                if (tileIndex >= PickupModal.FloorTreasures.Count)
+                                {
+                                    PickupModal.CurrentSelection = null;
+                                    PickupModal.CurrentActor = null;
+                                }
+                                else
+                                {
+                                    PickupModal.CurrentSelection = PickupModal.FloorTreasures[tileIndex].treasure;
+                                    PickupModal.CurrentActor = null;
+                                }
+                            }
+                            else
+                            {
+                                var (target, treasure) = PickupModal.ActorTreasures.Count > 0 ? PickupModal.ActorTreasures[0] : PickupModal.FloorTreasures.Count > 0 ? PickupModal.FloorTreasures[0] : (null, null);
+                                PickupModal.CurrentSelection = treasure;
+                                PickupModal.CurrentActor = target;
+                            }
+
+                            break;
+                    }
+                }
+                else
+                {
+                    if (handler.Space)
+                    {
+                        CollectTreasureOrReset(PickupModal.CurrentSelection != null ? (PickupModal.CurrentActor, PickupModal.CurrentSelection) : null);
+                    }
+                }
+
+                StateHasChanged();
                 return true;
             }
 
-            if (ctrl && handler.CtrlAction != null && handler.CtrlHold == hold)
+            if (Ctrl && handler.CtrlAction != null && handler.CtrlHold == hold)
             {
                 handler.CtrlAction(this);
                 waitTimer = WaitDelay;
                 return true;
             }
 
-            if (alt && !ctrl && handler.AltAction != null && handler.AltHold == hold)
+            if (Alt && !Ctrl && handler.AltAction != null && handler.AltHold == hold)
             {
                 handler.AltAction(this);
                 waitTimer = WaitDelay;
                 return true;
             }
 
-            if (shift && !alt && !ctrl && handler.ShiftAction != null && handler.ShiftHold == hold)
+            if (Shift && !Alt && !Ctrl && handler.ShiftAction != null && handler.ShiftHold == hold)
             {
                 handler.ShiftAction(this);
                 waitTimer = WaitDelay;
                 return true;
             }
 
-            if (!alt && !ctrl && !shift && handler.Action != null && handler.Hold == hold)
+            if (!Alt && !Ctrl && !Shift && handler.Action != null && handler.Hold == hold)
             {
                 handler.Action(this);
                 waitTimer = WaitDelay;
@@ -235,13 +339,16 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             var items = GameService.CurrentScene.GetPickupItems(x, y);
             var actorItems = items.Where(x => x.target != null).ToList();
+            var floorItems = items.Where(x => x.target == null).ToList();
             var pickupModalData = new PickupModalData
             {
                 ActorName = actorItems.Count > 0 ? MakeCaptionFromActorName(actorItems[0].target.Name) : null,
                 ActorTreasures = actorItems,
                 FloorTreasures = items.Where(x => x.target == null).ToList(),
                 X = x,
-                Y = y
+                Y = y,
+                CurrentSelection = actorItems.Count > 0 ? actorItems[0].treasure : floorItems.Count > 0 ? floorItems[0].treasure : null,
+                CurrentActor = actorItems.Count > 0 ? actorItems[0].target : null
             };
             PickupModal = pickupModalData;
             InterfaceShift = PickupModalShift;
@@ -252,15 +359,43 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             if (item != null)
             {
+                var actorIndex = PickupModal.ActorTreasures.FindIndex(x => x.treasure == PickupModal.CurrentSelection);
+                var tileIndex = PickupModal.FloorTreasures.FindIndex(x => x.treasure == PickupModal.CurrentSelection);
                 GameService.CurrentScene.Pickup(PickupModal.X, PickupModal.Y, item.Value.target, item.Value.treasure);
                 var items = GameService.CurrentScene.GetPickupItems(PickupModal.X, PickupModal.Y);
                 var actorItems = items.Where(x => x.target != null).ToList();
                 PickupModal.ActorName = actorItems.Count > 0 ? MakeCaptionFromActorName(actorItems[0].target.Name) : null;
                 PickupModal.ActorTreasures = items.Where(x => x.target != null).ToList();
                 PickupModal.FloorTreasures = items.Where(x => x.target == null).ToList();
+                if (actorIndex >= 0)
+                {
+                    if (actorIndex >= PickupModal.ActorTreasures.Count)
+                    {
+                        PickupModal.CurrentSelection = PickupModal.FloorTreasures.Count > 0 ? PickupModal.FloorTreasures[0].treasure : null;
+                        PickupModal.CurrentActor = null;
+                    }
+                    else
+                    {
+                        PickupModal.CurrentSelection = PickupModal.ActorTreasures[actorIndex].treasure;
+                        PickupModal.CurrentActor = PickupModal.ActorTreasures[actorIndex].target;
+                    }
+                }
+                else
+                {
+                    if (tileIndex >= PickupModal.FloorTreasures.Count)
+                    {
+                        PickupModal.CurrentSelection = null;
+                        PickupModal.CurrentActor = null;
+                    }
+                    else
+                    {
+                        PickupModal.CurrentSelection = PickupModal.FloorTreasures[tileIndex].treasure;
+                        PickupModal.CurrentActor = PickupModal.FloorTreasures[tileIndex].target;
+                    }
+                }
             }
 
-            if (item == null || (!PickupModal.FloorTreasures.Any() && !PickupModal.ActorTreasures.Any()))
+            if (item == null || GameService.CurrentScene.Player.AIState != AIState.Neutral || (!PickupModal.FloorTreasures.Any() && !PickupModal.ActorTreasures.Any()))
             {
                 PickupModal = null;
                 InterfaceShift = 0;
@@ -268,33 +403,31 @@ namespace LatronArs.WebClient.Pages.Scene
             }
         }
 
+        protected void OpenMainMenu()
+        {
+            Console.WriteLine("MainMenu");
+        }
+
         private void OnKeyDown(KeyboardEvent e)
         {
             if (e.Code == "Escape")
             {
+                Escape = true;
+                StateHasChanged();
                 return;
             }
 
-            if (e.Code == "Digit0")
+            if (e.Code == "AltRight" || e.Code == "AltLeft")
             {
-                ctrl = true;
+                Ctrl = true;
+                StateHasChanged();
                 return;
             }
 
-            if (e.Code == "Minus")
+            if (e.Code == "ShiftRight" || e.Code == "ShiftLeft")
             {
-                alt = true;
-                return;
-            }
-
-            if (e.Code == "Equal")
-            {
-                shift = true;
-                return;
-            }
-
-            if (PickupModal != null)
-            {
+                Alt = true;
+                StateHasChanged();
                 return;
             }
 
@@ -314,25 +447,28 @@ namespace LatronArs.WebClient.Pages.Scene
         {
             if (e.Code == "Escape")
             {
-                // TODO escape
+                Escape = false;
+                if (PickupModal != null)
+                {
+                    CollectTreasureOrReset(null);
+                }
+
+                OpenMainMenu();
+                StateHasChanged();
                 return;
             }
 
-            if (e.Code == "Digit0")
+            if (e.Code == "AltRight" || e.Code == "AltLeft")
             {
-                ctrl = false;
+                Ctrl = false;
+                StateHasChanged();
                 return;
             }
 
-            if (e.Code == "Minus")
+            if (e.Code == "ShiftRight" || e.Code == "ShiftLeft")
             {
-                alt = false;
-                return;
-            }
-
-            if (e.Code == "Equal")
-            {
-                shift = false;
+                Alt = false;
+                StateHasChanged();
                 return;
             }
 
@@ -495,6 +631,7 @@ namespace LatronArs.WebClient.Pages.Scene
                 else
                 {
                     GameService.CurrentScene.Wait();
+                    StateHasChanged();
                     waitTimer += WaitDelay;
                 }
             }
@@ -523,22 +660,22 @@ namespace LatronArs.WebClient.Pages.Scene
                 if (PickupModal != null)
                 {
                     CameraX = PickupModal.X + 0.5;
-                    CameraY = PickupModal.Y - 0.5;
+                    CameraY = PickupModal.Y - 1.5;
                 }
                 else
                 {
                     CameraX = scene.Player.CurrentTile.X + 0.5;
-                    CameraY = scene.Player.CurrentTile.Y - 0.5;
+                    CameraY = scene.Player.CurrentTile.Y - 1.5;
                 }
             }
 
             var cameraLeft = CameraX - ((canvasSize.Width + InterfaceShift) / 2 / TileSize / zoom);
             var cameraTop = CameraY - (canvasSize.Height / 2 / TileSize / zoom);
 
-            var left = (int)(cameraLeft - 1);
-            var right = (int)(cameraLeft + (canvasSize.Width / TileSize / zoom) + 2);
-            var top = (int)(cameraTop - 1);
-            var bottom = (int)(cameraTop + (canvasSize.Height / TileSize / zoom) + 2);
+            var left = (int)Math.Round(cameraLeft - 1);
+            var right = (int)Math.Round(cameraLeft + (canvasSize.Width / TileSize / zoom) + 2);
+            var top = (int)Math.Round(cameraTop - 1);
+            var bottom = (int)Math.Round(cameraTop + (canvasSize.Height / TileSize / zoom) + 2);
             var width = right - left + 1;
             var height = bottom - top + 1;
 

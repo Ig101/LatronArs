@@ -11,6 +11,8 @@ namespace LatronArs.WebClient.Services
 
         public Scene CurrentScene => _game?.CurrentScene;
 
+        public int PlannedSpends => _game?.PlannedSpends ?? 0;
+
         public GameState State { get; private set; }
 
         private void ChangeGameState(GameState state)

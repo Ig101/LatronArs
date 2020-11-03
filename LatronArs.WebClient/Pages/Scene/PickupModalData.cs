@@ -11,10 +11,12 @@ namespace LatronArs.WebClient.Pages.Scene
 
         public string ActorName { get; set; }
 
-        public IEnumerable<(Actor target, Treasure treasure)> ActorTreasures { get; set; }
+        public List<(Actor target, Treasure treasure)> ActorTreasures { get; set; }
 
-        public IEnumerable<(Actor target, Treasure treasure)> FloorTreasures { get; set; }
+        public List<(Actor target, Treasure treasure)> FloorTreasures { get; set; }
 
-        public int CurrentSelection { get; set; }
+        public Treasure CurrentSelection { get; set; }
+
+        public Actor CurrentActor { get; set; }
     }
 }

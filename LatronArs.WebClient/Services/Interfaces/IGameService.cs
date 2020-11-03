@@ -8,5 +8,7 @@ namespace LatronArs.WebClient.Services.Interfaces
         Scene CurrentScene { get; }
 
         GameState State { get; }
+
+        int PlannedSpends { get; }
     }
 }

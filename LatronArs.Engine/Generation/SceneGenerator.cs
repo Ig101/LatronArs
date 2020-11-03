@@ -38,18 +38,6 @@ namespace LatronArs.Engine.Generation
                     new Treasure(contentManager.GetTreasureInfo("coin"), 120),
                     new Treasure(contentManager.GetTreasureInfo("coin"), 120),
                     new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
-                    new Treasure(contentManager.GetTreasureInfo("coin"), 120),
                     new Treasure(contentManager.GetTreasureInfo("coin"), 120)
                 });
             _ = new Actor(

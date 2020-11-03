@@ -19,13 +19,13 @@ namespace LatronArs.Engine.Content.Actors
                         MoveAction = new ActionInfo
                         {
                             NoiseModifier = 0.1,
-                            TimeCost = 600,
+                            TimeCost = 100,
                             Action = ActionsManager.SimpleMove
                         },
                         SprintAction = new ActionInfo
                         {
                             NoiseModifier = 0.5,
-                            TimeCost = 300,
+                            TimeCost = 50,
                             Action = ActionsManager.SimpleMove
                         },
                         InteractAction = ActionsManager.PlayerInteraction,
@@ -51,13 +51,13 @@ namespace LatronArs.Engine.Content.Actors
                         MoveAction = new ActionInfo
                         {
                             NoiseModifier = 0.4,
-                            TimeCost = 800,
+                            TimeCost = 200,
                             Action = ActionsManager.SimpleMove
                         },
                         SprintAction = new ActionInfo
                         {
                             NoiseModifier = 1,
-                            TimeCost = 400,
+                            TimeCost = 60,
                             Action = ActionsManager.SimpleMove
                         },
                         InteractAction = ActionsManager.GuardianInteraction,

@@ -25,6 +25,8 @@ namespace LatronArs.Engine
 
         public int Seed { get; set; }
 
+        public int PlannedSpends { get; set; }
+
         public ISceneGenerator SceneGenerator { get; set; }
 
         public IContentManager ContentManager { get; set; }
@@ -110,6 +112,8 @@ namespace LatronArs.Engine
         private void SetupNewScene(SceneSave save = null)
         {
             ClearScene();
+
+            PlannedSpends = 210;
 
             CurrentScene = SceneGenerator.GenerateScene(Level, Seed, ContentManager);
             CurrentScene.SceneFinished += FinishSceneProcessing;

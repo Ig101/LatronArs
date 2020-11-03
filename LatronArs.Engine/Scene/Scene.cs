@@ -12,6 +12,8 @@ namespace LatronArs.Engine.Scene
         public const int ActionPointsPerSecond = 10;
         public const int HoursForPlay = 4;
         public const double LightNoise = 0.1;
+        public const int MoveCrushCost = 20;
+        public const int SprintCrushCost = 500;
 
         public event Action<SceneResult> SceneFinished;
 
@@ -185,6 +187,16 @@ namespace LatronArs.Engine.Scene
             }
 
             return result;
+        }
+
+        public string GetCurrentTime()
+        {
+            var secondsPassed = Time / ActionPointsPerSecond;
+            var hour = secondsPassed / 3600;
+            var hourString = hour < 10 ? "0" + hour.ToString() : hour.ToString();
+            var minute = (secondsPassed / 60) - (hour * 60);
+            var minuteString = minute < 10 ? "0" + minute.ToString() : minute.ToString();
+            return $"{hourString}:{minuteString}";
         }
 
         public void IssueNoise(int x, int y, double power, Actor source, string phrase)
